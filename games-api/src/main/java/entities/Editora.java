@@ -1,4 +1,9 @@
 package entities;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+import java.util.List; // Importante para o List<Jogo>
 @Entity
 @Data
 public class Editora {
@@ -12,4 +17,4 @@ public class Editora {
     @OneToMany(mappedBy = "editora") // Relacionamento One-to-Many
     private List<Jogo> jogos;
 }
-}
+

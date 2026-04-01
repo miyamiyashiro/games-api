@@ -1,4 +1,9 @@
 package entities;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 @Entity
 @Data
 public class Jogo {
@@ -6,14 +11,11 @@ public class Jogo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "O título é obrigatório") // Bean Validation
     private String titulo;
 
-    @NotNull
-    private Integer minJogadores;
-
-    @ManyToOne // O inverso do relacionamento
+    @ManyToOne
     @JoinColumn(name = "editora_id")
-    private Editora editora;
+    private Editora editora; // Relacionamento Many-to-One
 }
-}
+
