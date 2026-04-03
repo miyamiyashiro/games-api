@@ -17,5 +17,9 @@ public class Jogo {
     @ManyToOne
     @JoinColumn(name = "editora_id")
     private Editora editora; // Relacionamento Many-to-One
+
+    @Enumerated(EnumType.STRING) // Isso faz o banco salvar o nome "RPG" em vez de um número
+    @NotNull(message = "A categoria é obrigatória")
+    private Categoria categoria;
 }
 
