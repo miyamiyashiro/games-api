@@ -1,4 +1,4 @@
-# 🎮 Acervo Nerdolam API
+# 🎮 Acervo Nerdola API
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java" alt="Java 21">
