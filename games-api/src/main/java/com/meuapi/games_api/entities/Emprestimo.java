@@ -1,4 +1,4 @@
-package entities;
+package com.meuapi.games_api.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

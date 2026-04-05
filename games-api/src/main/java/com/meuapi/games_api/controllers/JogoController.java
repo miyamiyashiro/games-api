@@ -1,4 +1,4 @@
-package controllers;
+package com.meuapi.games_api.controllers;
 
 import com.meuapi.games_api.entities.Jogo;
 import com.meuapi.games_api.repositories.JogoRepository;

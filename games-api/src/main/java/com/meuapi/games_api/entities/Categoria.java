@@ -1,4 +1,4 @@
-package entities;
+package com.meuapi.games_api.entities;
 
 public enum Categoria {
     RPG,
