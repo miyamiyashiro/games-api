@@ -1,4 +1,4 @@
-package com.meuapi.games_api;
+package com.meuapi.games_api.infrastructure;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
