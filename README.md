@@ -1,19 +1,11 @@
-# 🎮 Acervo Nerdola API
+# Acervo Nerdola API
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring_Boot-3.4.1-green?style=for-the-badge&logo=springboot" alt="Spring Boot 3">
-  <img src="https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker" alt="Docker">
-  <img src="https://img.shields.io/badge/Render-Live-brightgreen?style=for-the-badge&logo=render" alt="Render Live">
-</p>
-
-> **Status do Projeto:** 🟢 Link Online: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+> **Status do Projeto:** Link Online: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
 
 API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. O projeto foca em boas práticas de design de API, utilizando o nível 3 da maturidade de Richardson (HATEOAS).
+Desenvolvido por Luana Miyashiro Salles de Oliveira Projeto acadêmico para a disciplina de Desenvolvimento de Web Services
 
-## ✨ Desenvolvido por Luana Miyashiro Projeto acadêmico para a disciplina de Desenvolvimento de Web Services
-
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 - **Java 21** (LTS)
 - **Spring Boot 3.4.1**
 - **Spring Data JPA** (Persistência)
@@ -23,20 +15,20 @@ API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. 
 - **Docker** (Containerização)
 - **SpringDoc/Swagger** (Documentação)
 
-## 🏗️ Arquitetura e Funcionalidades
+## Arquitetura e Funcionalidades
 - **Modelo de Dados**: Possui relacionamentos complexos como `@ManyToOne` (Jogos -> Editoras) e `@OneToMany`.
 - **HATEOAS**: Todos os recursos retornam links de navegação automática.
 - **Data Seeding**: Banco de dados populado automaticamente ao iniciar (`LoadDatabase`).
 - **Global Exception Handling**: Tratamento de erros centralizado para retornos HTTP precisos.
 
-🚀 Como Executar
+Como Executar
 Clone o repositório.
 
 Certifique-se de usar o JDK 21.
 
 Execute via Maven: ./mvnw spring-boot:run ou via Docker: docker compose up.
 
-## 📖 Exemplo de Uso (Endpoints)
+## Exemplo de Uso (Endpoints)
 
 ### Listar Jogos (Com Paginação e HATEOAS)
 `GET /jogos?page=0&size=5`
