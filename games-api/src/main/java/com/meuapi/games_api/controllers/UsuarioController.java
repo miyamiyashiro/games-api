@@ -16,13 +16,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/usuarios")
-
 public class UsuarioController {
-    @Autowired
-    private UsuarioRepository repository;
+
+    private final UsuarioRepository repository;
+    private final PagedResourcesAssembler<Usuario> pagedResourcesAssembler;
 
     @Autowired
-    private PagedResourcesAssembler<Usuario> pagedResourcesAssembler;
+    public UsuarioController(UsuarioRepository repository, PagedResourcesAssembler<Usuario> pagedResourcesAssembler) {
+        this.repository = repository;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(Pageable pageable) {
@@ -33,6 +36,13 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Usuario> criar(@Valid @RequestBody Usuario usuario) {
         return ResponseEntity.status(201).body(repository.save(usuario));
+    }
+
+    @GetMapping("/{id}")
+    public EntityModel<Usuario> buscarPorId(@PathVariable Long id) {
+        Usuario usuario = repository.findById(id).orElseThrow();
+        return EntityModel.of(usuario,
+                linkTo(methodOn(UsuarioController.class).buscarPorId(id)).withSelfRel());
     }
 
     @DeleteMapping("/{id}")

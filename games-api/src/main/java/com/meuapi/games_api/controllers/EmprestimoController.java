@@ -16,11 +16,10 @@ import java.time.LocalDate;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
-
 @RestController
 @RequestMapping("/emprestimos")
-
 public class EmprestimoController {
+
     private final EmprestimoRepository repository;
     private final PagedResourcesAssembler<Emprestimo> assembler;
 
@@ -38,7 +37,6 @@ public class EmprestimoController {
 
     @PostMapping
     public ResponseEntity<Emprestimo> realizarEmprestimo(@Valid @RequestBody Emprestimo emprestimo) {
-        // Define a data atual como data do empréstimo automaticamente
         emprestimo.setDataEmprestimo(LocalDate.now());
         return ResponseEntity.status(201).body(repository.save(emprestimo));
     }
@@ -47,7 +45,6 @@ public class EmprestimoController {
     public EntityModel<Emprestimo> buscar(@PathVariable Long id) {
         Emprestimo emprestimo = repository.findById(id).orElseThrow();
         return EntityModel.of(emprestimo,
-                linkTo(methodOn(EmprestimoController.class).buscar(id)).withSelfRel(),
-                linkTo(methodOn(EmprestimoController.class).listar(null)).withRel("todos-emprestimos"));
+                linkTo(methodOn(EmprestimoController.class).buscar(id)).withSelfRel());
     }
 }

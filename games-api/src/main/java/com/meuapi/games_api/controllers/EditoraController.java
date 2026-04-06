@@ -1,7 +1,6 @@
 package com.meuapi.games_api.controllers;
 
 import com.meuapi.games_api.entities.Editora;
-import com.meuapi.games_api.entities.Editora;
 import com.meuapi.games_api.repositories.EditoraRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,22 +12,28 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RestController
+@RequestMapping("/editoras")
 public class EditoraController {
-    @Autowired
-    private EditoraRepository repository;
+
+    private final EditoraRepository repository;
+    private final PagedResourcesAssembler<Editora> pagedResourcesAssembler;
 
     @Autowired
-    private PagedResourcesAssembler<Editora> pagedResourcesAssembler;
+    public EditoraController(EditoraRepository repository, PagedResourcesAssembler<Editora> pagedResourcesAssembler) {
+        this.repository = repository;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Editora>>> listarTodos(Pageable pageable) {
-        Page<Editora> usuarios = repository.findAll(pageable);
-        return ResponseEntity.ok(pagedResourcesAssembler.toModel(usuarios));
+        Page<Editora> editoras = repository.findAll(pageable);
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(editoras));
     }
 
     @PostMapping
-    public ResponseEntity<Editora> criar(@Valid @RequestBody Editora usuario) {
-        return ResponseEntity.status(201).body(repository.save(usuario));
+    public ResponseEntity<Editora> criar(@Valid @RequestBody Editora editora) {
+        return ResponseEntity.status(201).body(repository.save(editora));
     }
 
     @DeleteMapping("/{id}")

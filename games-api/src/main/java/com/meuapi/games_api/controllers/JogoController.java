@@ -14,18 +14,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/jogos")
-
 public class JogoController {
-    @Autowired
-    private JogoRepository repository;
+
+    private final JogoRepository repository;
+    private final PagedResourcesAssembler<Jogo> pagedResourcesAssembler;
 
     @Autowired
-    private PagedResourcesAssembler<Jogo> pagedResourcesAssembler;
+    public JogoController(JogoRepository repository, PagedResourcesAssembler<Jogo> pagedResourcesAssembler) {
+        this.repository = repository;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
 
     @GetMapping
     public PagedModel<EntityModel<Jogo>> listarTodos(Pageable pageable) {
         Page<Jogo> jogos = repository.findAll(pageable);
-        // Retorna os dados com links HATEOAS e paginação automática
         return pagedResourcesAssembler.toModel(jogos,
                 jogo -> EntityModel.of(jogo,
                         linkTo(methodOn(JogoController.class).buscarPorId(jogo.getId())).withSelfRel()));
@@ -35,7 +37,6 @@ public class JogoController {
     public EntityModel<Jogo> buscarPorId(@PathVariable Long id) {
         Jogo jogo = repository.findById(id).orElseThrow();
         return EntityModel.of(jogo,
-                linkTo(methodOn(JogoController.class).buscarPorId(id)).withSelfRel(),
-                linkTo(methodOn(JogoController.class).listarTodos(null)).withRel("lista"));
+                linkTo(methodOn(JogoController.class).buscarPorId(id)).withSelfRel());
     }
 }
