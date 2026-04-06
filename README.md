@@ -1,4 +1,4 @@
-# Acervo Games API
+# Games API
 
 > **Status do Projeto:** **LIVE** > Documentação Oficial: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
 
