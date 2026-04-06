@@ -11,6 +11,8 @@
 
 API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. O projeto foca em boas práticas de design de API, utilizando o nível 3 da maturidade de Richardson (HATEOAS).
 
+## ✨ Desenvolvido por Luana Miyashiro Projeto acadêmico para a disciplina de Desenvolvimento de Web Services
+
 ## 🛠️ Tecnologias Utilizadas
 - **Java 21** (LTS)
 - **Spring Boot 3.4.1**
@@ -26,6 +28,13 @@ API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. 
 - **HATEOAS**: Todos os recursos retornam links de navegação automática.
 - **Data Seeding**: Banco de dados populado automaticamente ao iniciar (`LoadDatabase`).
 - **Global Exception Handling**: Tratamento de erros centralizado para retornos HTTP precisos.
+
+🚀 Como Executar
+Clone o repositório.
+
+Certifique-se de usar o JDK 21.
+
+Execute via Maven: ./mvnw spring-boot:run ou via Docker: docker compose up.
 
 ## 📖 Exemplo de Uso (Endpoints)
 
@@ -51,3 +60,5 @@ API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. 
     "self": { "href": "[https://games-api-3rqr.onrender.com/jogos?page=0&size=5](https://games-api-3rqr.onrender.com/jogos?page=0&size=5)" }
   }
 }
+´´
+
