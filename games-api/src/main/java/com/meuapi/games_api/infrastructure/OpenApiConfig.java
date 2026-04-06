@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "Acervo Nerdola API",
+                title = "GamesBoard API",
                 version = "1.0.0",
                 description = "API para gestão de acervo e empréstimos de jogos de tabuleiro e RPG.",
                 contact = @Contact(name = "Luana Miyashiro", email = "luakawaii13@gmail.com")
