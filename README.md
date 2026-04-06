@@ -2,34 +2,52 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring_Boot-3-green?style=for-the-badge&logo=springboot" alt="Spring Boot 3">
+  <img src="https://img.shields.io/badge/Spring_Boot-3.4.1-green?style=for-the-badge&logo=springboot" alt="Spring Boot 3">
   <img src="https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker" alt="Docker">
+  <img src="https://img.shields.io/badge/Render-Live-brightgreen?style=for-the-badge&logo=render" alt="Render Live">
 </p>
 
-API desenvolvida para a gestão de acervo de jogos de tabuleiro e RPG, permitindo o controle de usuários, editoras e o ciclo completo de empréstimos.
+> **Status do Projeto:** 🟢 Link Online: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
 
-## 🛠️ Funcionalidades
-- **Gestão de Acervo**: Cadastro completo de jogos com categorias (Tabuleiro/RPG).
-- **Controle de Usuários**: Registro de jogadores e histórico.
-- **Sistema de Empréstimos**: Registro de retirada e data de devolução.
-- **HATEOAS**: Navegação facilitada entre recursos através de links dinâmicos.
-- **Paginação**: Endpoints otimizados para grandes volumes de dados.
+API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. O projeto foca em boas práticas de design de API, utilizando o nível 3 da maturidade de Richardson (HATEOAS).
 
-## 🚀 Como Executar o Projeto
+## 🛠️ Tecnologias Utilizadas
+- **Java 21** (LTS)
+- **Spring Boot 3.4.1**
+- **Spring Data JPA** (Persistência)
+- **H2 Database** (Banco em memória para testes)
+- **Spring HATEOAS** (Links dinâmicos)
+- **Bean Validation** (Validação de dados)
+- **Docker** (Containerização)
+- **SpringDoc/Swagger** (Documentação)
 
-### Localmente
-1. Certifique-se de ter o **Java 21** instalado.
-2. Clone o repositório e abra no IntelliJ.
-3. Execute a classe `GamesApiApplication`.
-4. Acesse: `http://localhost:8080`
+## 🏗️ Arquitetura e Funcionalidades
+- **Modelo de Dados**: Possui relacionamentos complexos como `@ManyToOne` (Jogos -> Editoras) e `@OneToMany`.
+- **HATEOAS**: Todos os recursos retornam links de navegação automática.
+- **Data Seeding**: Banco de dados populado automaticamente ao iniciar (`LoadDatabase`).
+- **Global Exception Handling**: Tratamento de erros centralizado para retornos HTTP precisos.
 
-### Via Docker (Opcional)
-```bash
-docker build -t games-api .
-docker run -p 8080:8080 games-api
+## 📖 Exemplo de Uso (Endpoints)
 
-## 📖 Documentação da API
-A documentação interativa (Swagger) pode ser acessada em tempo de execução:
-👉 http://localhost:8080/swagger-ui/index.html
+### Listar Jogos (Com Paginação e HATEOAS)
+`GET /jogos?page=0&size=5`
 
-Desenvolvido por Luana Miyashiro como projeto da disciplina de Programação de Dispositivos Móveis.
+**Resposta de Exemplo:**
+```json
+{
+  "_embedded": {
+    "jogoList": [
+      {
+        "id": 1,
+        "titulo": "Catan",
+        "categoria": "TABULEIRO",
+        "_links": {
+          "self": { "href": "[https://games-api-3rqr.onrender.com/jogos/1](https://games-api-3rqr.onrender.com/jogos/1)" }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": { "href": "[https://games-api-3rqr.onrender.com/jogos?page=0&size=5](https://games-api-3rqr.onrender.com/jogos?page=0&size=5)" }
+  }
+}
