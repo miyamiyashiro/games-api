@@ -1,56 +1,61 @@
-# Acervo Nerdola API
+# Acervo Games API
 
-> **Status do Projeto:** Link Online: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+> **Status do Projeto:** **LIVE** > Documentação Oficial: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
 
-API robusta desenvolvida para a gestão de acervos de jogos de tabuleiro e RPG. O projeto foca em boas práticas de design de API, utilizando o nível 3 da maturidade de Richardson (HATEOAS).
-Desenvolvido por Luana Miyashiro Salles de Oliveira Projeto acadêmico para a disciplina de Desenvolvimento de Web Services
+API desenvolvida para gestão de acervos de jogos de tabuleiro e RPG, com foco em Hipermídia (HATEOAS) e conteinerização.
+Luana Miyashiro Salles de Oliveira
 
-## Tecnologias Utilizadas
-- **Java 21** (LTS)
-- **Spring Boot 3.4.1**
-- **Spring Data JPA** (Persistência)
-- **H2 Database** (Banco em memória para testes)
-- **Spring HATEOAS** (Links dinâmicos)
-- **Bean Validation** (Validação de dados)
-- **Docker** (Containerização)
-- **SpringDoc/Swagger** (Documentação)
+---
 
-## Arquitetura e Funcionalidades
-- **Modelo de Dados**: Possui relacionamentos complexos como `@ManyToOne` (Jogos -> Editoras) e `@OneToMany`.
-- **HATEOAS**: Todos os recursos retornam links de navegação automática.
-- **Data Seeding**: Banco de dados populado automaticamente ao iniciar (`LoadDatabase`).
-- **Global Exception Handling**: Tratamento de erros centralizado para retornos HTTP precisos.
+## Modelagem de Dados (Entidades)
 
-Como Executar
-Clone o repositório.
+O sistema foi modelado para garantir integridade referencial e escalabilidade:
 
-Certifique-se de usar o JDK 21.
+* **Jogo**: Possui título, categoria (Enum) e vínculo com uma Editora.
+* **Usuário**: Registro de clientes com validação de e-mail único.
+* **Editora**: Gerencia as marcas que publicam os jogos.
+* **Empréstimo**: Controla o ciclo de retirada e devolução de itens do acervo.
+* **Categoria**: Enumeração (RPG, TABULEIRO, CARTAS, etc).
 
-Execute via Maven: ./mvnw spring-boot:run ou via Docker: docker compose up.
+---
 
-## Exemplo de Uso (Endpoints)
+## Guia de Deploy (Render + Docker)
+Para replicar o deploy deste projeto no Render, siga estas etapas:
 
-### Listar Jogos (Com Paginação e HATEOAS)
-`GET /jogos?page=0&size=5`
+* **Repositório**: Suba o código garantindo que o Dockerfile esteja na raiz da pasta do projeto.
+* **Root Directory**: No painel do Render, configure o "Root Directory" como games-api.
+* **Runtime**: Selecione Docker como ambiente de execução.
+* **Build**: O Render usará o arquivo Dockerfile automaticamente para compilar o Java 21.
 
-**Resposta de Exemplo:**
+
+---
+
+## Tecnologias e Padrões
+* **Java 21 & Spring Boot 3.4.1**: Versões estáveis e modernas.
+* **HATEOAS**: Nível 3 de Maturidade de Richardson.
+* **JPA/Hibernate**: Mapeamento objeto-relacional automático.
+* **Global Exception Handling**: Tratamento de erros customizado.
+
+## Documentação dos Endpoints
+
+Abaixo, os principais recursos disponíveis. Todos suportam **HATEOAS**.
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/jogos` | Lista todos os jogos com paginação. |
+| `GET` | `/jogos/{id}` | Detalha um jogo específico e seus links. |
+| `POST` | `/usuarios` | Cadastra um novo usuário com validação `@Valid`. |
+| `POST` | `/emprestimos` | Registra um empréstimo com data automática. |
+
+### Exemplo de Resposta (HATEOAS)
 ```json
 {
-  "_embedded": {
-    "jogoList": [
-      {
-        "id": 1,
-        "titulo": "Catan",
-        "categoria": "TABULEIRO",
-        "_links": {
-          "self": { "href": "[https://games-api-3rqr.onrender.com/jogos/1](https://games-api-3rqr.onrender.com/jogos/1)" }
-        }
-      }
-    ]
-  },
+  "id": 1,
+  "titulo": "Catan",
+  "categoria": "TABULEIRO",
   "_links": {
-    "self": { "href": "[https://games-api-3rqr.onrender.com/jogos?page=0&size=5](https://games-api-3rqr.onrender.com/jogos?page=0&size=5)" }
+    "self": { "href": "[https://games-api-3rqr.onrender.com/jogos/1](https://games-api-3rqr.onrender.com/jogos/1)" },
+    "lista": { "href": "[https://games-api-3rqr.onrender.com/jogos?page=0&size=20](https://games-api-3rqr.onrender.com/jogos?page=0&size=20)" }
   }
 }
-´´
 
