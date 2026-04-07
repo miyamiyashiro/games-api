@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import java.util.List; // Importante para o List<Jogo>
+import java.util.List; 
 @Entity
 @Data
 public class Editora {
