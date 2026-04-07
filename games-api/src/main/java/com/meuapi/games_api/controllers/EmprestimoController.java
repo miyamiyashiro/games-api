@@ -30,9 +30,19 @@ public class EmprestimoController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<Emprestimo>>> listar(Pageable pageable) {
+    public PagedModel<EntityModel<Emprestimo>> listarTodos(Pageable pageable) {
         Page<Emprestimo> emprestimos = repository.findAll(pageable);
-        return ResponseEntity.ok(assembler.toModel(emprestimos));
+        return assembler.toModel(emprestimos,
+                emp -> EntityModel.of(emp,
+                        linkTo(methodOn(EmprestimoController.class).buscarPorId(emp.getId())).withSelfRel()));
+    }
+
+    @GetMapping("/{id}")
+    public EntityModel<Emprestimo> buscarPorId(@PathVariable Long id) {
+        Emprestimo emp = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado"));
+        return EntityModel.of(emp,
+                linkTo(methodOn(EmprestimoController.class).buscarPorId(id)).withSelfRel());
     }
 
     @PostMapping
@@ -41,10 +51,18 @@ public class EmprestimoController {
         return ResponseEntity.status(201).body(repository.save(emprestimo));
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<Emprestimo> buscar(@PathVariable Long id) {
-        Emprestimo emprestimo = repository.findById(id).orElseThrow();
-        return EntityModel.of(emprestimo,
-                linkTo(methodOn(EmprestimoController.class).buscar(id)).withSelfRel());
+    @PutMapping("/{id}")
+    public EntityModel<Emprestimo> atualizar(@PathVariable Long id, @RequestBody Emprestimo novo) {
+        return repository.findById(id).map(emp -> {
+            emp.setDataDevolucao(novo.getDataDevolucao());
+            return EntityModel.of(repository.save(emp),
+                    linkTo(methodOn(EmprestimoController.class).buscarPorId(id)).withSelfRel());
+        }).orElseThrow(() -> new RuntimeException("Não encontrado"));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
