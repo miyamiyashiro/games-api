@@ -14,7 +14,7 @@ public class Editora {
     @NotBlank @Size(min = 2)
     private String nome;
 
-    @OneToMany(mappedBy = "editora") // Relacionamento One-to-Many
+    @OneToMany(mappedBy = "editora")
     private List<Jogo> jogos;
 }
 
