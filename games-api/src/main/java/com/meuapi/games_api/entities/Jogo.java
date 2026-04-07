@@ -2,9 +2,9 @@ package com.meuapi.games_api.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor; // Adicione este import
+import lombok.AllArgsConstructor; 
 import lombok.Data;
-import lombok.NoArgsConstructor; // Adicione este import
+import lombok.NoArgsConstructor; 
 
 @Entity
 @Data
