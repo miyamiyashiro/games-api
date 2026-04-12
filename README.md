@@ -11,11 +11,13 @@ Luana Miyashiro Salles de Oliveira
 
 O sistema foi modelado para garantir integridade referencial e escalabilidade:
 
-* **Jogo**: Possui título, categoria (Enum) e vínculo com uma Editora.
-* **Usuário**: Registro de clientes com validação de e-mail único.
-* **Editora**: Gerencia as marcas que publicam os jogos.
-* **Empréstimo**: Controla o ciclo de retirada e devolução de itens do acervo.
+* **Jogo**: Registro central com título, categoria (Enum) e vínculos com Editora e Plataformas.
+* **Usuário**: Gestão de clientes com validação de campos obrigatórios e e-mail.
+* **Editora**: Mapeamento das publicadoras dos jogos (One-to-Many com Jogo).
+* **Empréstimo**: Controle de transações de retirada e devolução (Many-to-One com Usuário e Jogo).
 * **Categoria**: Enumeração (RPG, TABULEIRO, CARTAS, etc).
+* **Plataforma**: Consoles e sistemas onde o jogo está disponível (Many-to-Many com Jogo).
+
 
 ---
 
@@ -35,22 +37,24 @@ Para replicar o deploy deste projeto no Render, siga estas etapas:
 * **HATEOAS**: Nível 3 de Maturidade de Richardson.
 * **JPA/Hibernate**: Mapeamento objeto-relacional automático.
 * **Global Exception Handling**: Tratamento de erros customizado.
+* **Spring Data JPA**: Abstração de persistência com banco de dados H2 (In-memory).
+* **Springdoc OpenAPI (Swagger)**: Documentação técnica detalhada e testável.
+* **Bean Validation**: Validação rigorosa de dados na entrada da API.
+
+---
+
 
 ## Documentação dos Endpoints
 
 Abaixo, os principais recursos disponíveis. Todos suportam **HATEOAS**.
 
-| Método | Endpoint | Descrição |
+| Recurso | Tipo de Consulta Personalizada | Endpoint Exemplo |
 | :--- | :--- | :--- |
-| `GET` | `/jogos` | Lista todos os jogos com paginação. |
-| `GET` | `/jogos/busca` | **Consulta Personalizada** por título. |
-| `GET` | `/jogos/{id}` | Detalha um jogo específico e seus links. |
-| `POST` | `/jogos` | Cadastra um novo jogo (Status 201). |
-| `PUT` | `/jogos/{id}` | Atualização completa dos dados do jogo. |
-| `DELETE` | `/jogos/{id}` | Remoção física do registro no banco H2. |
-| `POST` | `/usuarios` | Cadastra um novo usuário com validação `@Valid`. |
-| `POST` | `/emprestimos` | Registra um empréstimo com data automática. |
-| `POST` | `/emprestimos` | Realiza empréstimo com data automática. |
+| `Jogos` | `Busca por Título (Case Insensitive)` | GET /jogos/busca?titulo=catan. |
+| `Usuários` | `Busca exata por E-mail` | GET /usuarios/email/barbara@gmail.com. |
+| `Editoras` | `Busca por parte do Nome` | GET /editoras/busca?nome=galapagos. |
+| `Plataformas` | `Busca por Nome do Console` | GET /plataformas/busca?nome=PS5. |
+| `Empréstimos` | `Filtro por Data de Registro` | GET /emprestimos/data?data=2026-04-11. |
 
 
 ### Exemplo de Resposta (HATEOAS)
