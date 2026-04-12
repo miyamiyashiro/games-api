@@ -16,10 +16,15 @@ import org.springframework.hateoas.CollectionModel;
 import java.util.List;
 import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
+@Tag(name = "Jogos")
 @RequestMapping("/jogos")
 public class JogoController {
 
@@ -32,6 +37,12 @@ public class JogoController {
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Lista todos os jogos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public PagedModel<EntityModel<Jogo>> listarTodos(Pageable pageable) {
         Page<Jogo> jogos = repository.findAll(pageable);
@@ -40,6 +51,12 @@ public class JogoController {
                         linkTo(methodOn(JogoController.class).buscarPorId(jogo.getId())).withSelfRel()));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Busca um jogo por ID", description = "Retorna os detalhes de um jogo específico")
     @GetMapping("/{id}")
     public EntityModel<Jogo> buscarPorId(@PathVariable Long id) {
         Jogo jogo = repository.findById(id).orElseThrow();
@@ -47,6 +64,12 @@ public class JogoController {
                 linkTo(methodOn(JogoController.class).buscarPorId(id)).withSelfRel());
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Atualiza um jogo", description = "Permite alterar título ou categoria de um jogo existente")
     @PutMapping("/{id}")
     public EntityModel<Jogo> atualizar(@PathVariable Long id, @RequestBody Jogo novoJogo) {
         return repository.findById(id)
@@ -60,12 +83,24 @@ public class JogoController {
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado"));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Jogo excluído com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Exclui um jogo", description = "Remove permanentemente o jogo do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Consulta personalizada", description = "Busca jogos por parte do título (case-insensitive)")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Jogo>> buscarPorTitulo(@RequestParam String titulo) {
         List<EntityModel<Jogo>> jogos = repository.findByTituloContainingIgnoreCase(titulo).stream()
@@ -73,5 +108,20 @@ public class JogoController {
                         linkTo(methodOn(JogoController.class).buscarPorId(jogo.getId())).withSelfRel()))
                 .collect(Collectors.toList());
         return CollectionModel.of(jogos);
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+    })
+    @Operation(summary = "Cadastra um novo jogo", description = "Cria um novo jogo no acervo para o usuário escolher")
+    @PostMapping
+    public ResponseEntity<EntityModel<Jogo>> criar(@RequestBody Jogo jogo) {
+        Jogo novo = repository.save(jogo);
+        EntityModel<Jogo> model = EntityModel.of(novo,
+                linkTo(methodOn(JogoController.class).buscarPorId(novo.getId())).withSelfRel(),
+                linkTo(methodOn(JogoController.class).listarTodos(null)).withRel("lista"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(model);
     }
 }

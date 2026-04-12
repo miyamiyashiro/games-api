@@ -10,8 +10,11 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "GamesBoard API",
                 version = "1.0.0",
-                description = "API para gestão de acervo e empréstimos de jogos de tabuleiro e RPG.",
-                contact = @Contact(name = "Luana Miyashiro", email = "luakawaii13@gmail.com")
+                description = "Sistema completo para gestão de acervos e empréstimos de jogos. " +
+                        "A API implementa **HATEOAS** para navegabilidade, **Paginação** em todas as listagens, " +
+                        "relacionamentos complexos (incluindo **Many-to-Many**) e consultas personalizadas por domínio. " +
+                        "Desenvolvido com Spring Boot 3 e persistência em banco H2.",
+                contact = @Contact(name = "Luana Miyashiro")
         )
 )
 
