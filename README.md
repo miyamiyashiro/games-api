@@ -43,9 +43,15 @@ Abaixo, os principais recursos disponíveis. Todos suportam **HATEOAS**.
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `GET` | `/jogos` | Lista todos os jogos com paginação. |
+| `GET` | `/jogos/busca` | **Consulta Personalizada** por título. |
 | `GET` | `/jogos/{id}` | Detalha um jogo específico e seus links. |
+| `POST` | `/jogos` | Cadastra um novo jogo (Status 201). |
+| `PUT` | `/jogos/{id}` | Atualização completa dos dados do jogo. |
+| `DELETE` | `/jogos/{id}` | Remoção física do registro no banco H2. |
 | `POST` | `/usuarios` | Cadastra um novo usuário com validação `@Valid`. |
 | `POST` | `/emprestimos` | Registra um empréstimo com data automática. |
+| `POST` | `/emprestimos` | Realiza empréstimo com data automática. |
+
 
 ### Exemplo de Resposta (HATEOAS)
 ```json
