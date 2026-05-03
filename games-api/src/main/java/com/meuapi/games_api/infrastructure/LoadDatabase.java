@@ -29,8 +29,8 @@ public class LoadDatabase {
             DetalhesJogoRepository detalhesJogoRepository
     ) {
         return args -> {
-            Editora galapagos = editoraRepository.save(criarEditora("Galápagos Jogos"));
-            Plataforma tabuleiro = plataformaRepository.save(criarPlataforma("Tabuleiro físico"));
+            Editora galapagos = editoraRepository.save(criarEditora("Galapagos Jogos"));
+            Plataforma tabuleiro = plataformaRepository.save(criarPlataforma("Tabuleiro fisico"));
             Plataforma rpg = plataformaRepository.save(criarPlataforma("RPG de mesa"));
 
             Jogo catan = new Jogo();
@@ -47,7 +47,7 @@ public class LoadDatabase {
             dnd.setPlataformas(List.of(rpg));
             dnd = jogoRepository.save(dnd);
 
-            detalhesJogoRepository.save(criarDetalhes("Jogo de negociação e estratégia.", 10, 90, catan));
+            detalhesJogoRepository.save(criarDetalhes("Jogo de negociacao e estrategia.", 10, 90, catan));
             detalhesJogoRepository.save(criarDetalhes("Sistema de RPG de fantasia medieval.", 12, 180, dnd));
 
             log.info("Base inicial de jogos carregada com sucesso");

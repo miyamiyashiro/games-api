@@ -1,71 +1,75 @@
 # Games API
 
-> **Status do Projeto:** **LIVE** > Documentação Oficial: [https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+> **Status do Projeto:** LIVE  
+> **Documentacao Oficial:** [Swagger UI](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
 
-API desenvolvida para gestão de acervos de jogos de tabuleiro e RPG, com foco em Hipermídia (HATEOAS) e conteinerização.
-Luana Miyashiro Salles de Oliveira
+API desenvolvida para gestao de acervos de jogos de tabuleiro e RPG, com foco em REST, HATEOAS, validacao de dados, documentacao OpenAPI e deploy conteinerizado.
 
----
-
-## Modelagem de Dados (Entidades)
-
-O sistema foi modelado para garantir integridade referencial e escalabilidade:
-
-* **Jogo**: Registro central com título, categoria (Enum) e vínculos com Editora e Plataformas.
-* **Usuário**: Gestão de clientes com validação de campos obrigatórios e e-mail.
-* **Editora**: Mapeamento das publicadoras dos jogos (One-to-Many com Jogo).
-* **Empréstimo**: Controle de transações de retirada e devolução (Many-to-One com Usuário e Jogo).
-* **Categoria**: Enumeração (RPG, TABULEIRO, CARTAS, etc).
-* **Plataforma**: Consoles e sistemas onde o jogo está disponível (Many-to-Many com Jogo).
-
+Autora: Luana Miyashiro Salles de Oliveira
 
 ---
 
-## Guia de Deploy (Render + Docker)
-Para replicar o deploy deste projeto no Render, siga estas etapas:
+## Modelagem de Dados
 
-* **Repositório**: Suba o código garantindo que o Dockerfile esteja na raiz da pasta do projeto.
-* **Root Directory**: No painel do Render, configure o "Root Directory" como games-api.
-* **Runtime**: Selecione Docker como ambiente de execução.
-* **Build**: O Render usará o arquivo Dockerfile automaticamente para compilar o Java 21.
+O sistema foi modelado para demonstrar os principais tipos de relacionamento exigidos na avaliacao:
 
-
----
-
-## Tecnologias e Padrões
-* **Java 21 & Spring Boot 3.4.1**: Versões estáveis e modernas.
-* **HATEOAS**: Nível 3 de Maturidade de Richardson.
-* **JPA/Hibernate**: Mapeamento objeto-relacional automático.
-* **Global Exception Handling**: Tratamento de erros customizado.
-* **Spring Data JPA**: Abstração de persistência com banco de dados H2 (In-memory).
-* **Springdoc OpenAPI (Swagger)**: Documentação técnica detalhada e testável.
-* **Bean Validation**: Validação rigorosa de dados na entrada da API.
+* **Jogo**: registro central do acervo, com titulo, categoria, editora, plataformas e detalhes complementares.
+* **DetalhesJogo**: informacoes complementares de um jogo, em relacionamento One-to-One com Jogo.
+* **Usuario**: cliente que pode realizar emprestimos.
+* **Editora**: publicadora dos jogos, em relacionamento One-to-Many com Jogo.
+* **Emprestimo**: controle de retirada e devolucao, em relacionamento Many-to-One com Usuario e Jogo.
+* **Plataforma**: meio ou sistema onde o jogo esta disponivel, em relacionamento Many-to-Many com Jogo.
+* **Categoria**: enum com os tipos de jogos cadastrados.
 
 ---
 
+## Tecnologias
 
-## Documentação dos Endpoints
+* Java 21
+* Spring Boot 3.4.1
+* Spring Data JPA / Hibernate
+* H2 Database
+* Bean Validation
+* Spring HATEOAS
+* Springdoc OpenAPI / Swagger
+* Docker
 
-Abaixo, os principais recursos disponíveis. Todos suportam **HATEOAS**.
+---
 
-| Recurso | Tipo de Consulta Personalizada | Endpoint Exemplo |
+## Principais Endpoints
+
+| Recurso | Consulta personalizada | Exemplo |
 | :--- | :--- | :--- |
-| `Jogos` | `Busca por Título (Case Insensitive)` | GET /jogos/busca?titulo=catan. |
-| `Usuários` | `Busca exata por E-mail` | GET /usuarios/email/barbara@gmail.com. |
-| `Editoras` | `Busca por parte do Nome` | GET /editoras/busca?nome=galapagos. |
-| `Plataformas` | `Busca por Nome do Console` | GET /plataformas/busca?nome=PS5. |
-| `Empréstimos` | `Filtro por Data de Registro` | GET /emprestimos/data?data=2026-04-11. |
+| `Jogos` | Busca por parte do titulo | `GET /jogos/busca?titulo=catan` |
+| `Usuarios` | Busca exata por e-mail | `GET /usuarios/email/luana@email.com` |
+| `Editoras` | Busca por parte do nome | `GET /editoras/busca?nome=galapagos` |
+| `Plataformas` | Busca por parte do nome | `GET /plataformas/busca?nome=tabuleiro` |
+| `Emprestimos` | Filtro por data | `GET /emprestimos/data?data=2026-04-11` |
+| `DetalhesJogo` | Busca pelo ID do jogo | `GET /detalhes-jogos/jogo/1` |
 
+---
 
-### Exemplo de Resposta (HATEOAS)
-```json
-{
-  "id": 1,
-  "titulo": "Catan",
-  "categoria": "TABULEIRO",
-  "_links": {
-    "self": { "href": "[https://games-api-3rqr.onrender.com/jogos/1](https://games-api-3rqr.onrender.com/jogos/1)" },
-    "lista": { "href": "[https://games-api-3rqr.onrender.com/jogos?page=0&size=20](https://games-api-3rqr.onrender.com/jogos?page=0&size=20)" }
-  }
-}
+## Roteiro Sugerido Para Demonstracao
 
+1. Listar editoras e plataformas ja carregadas pela base inicial.
+2. Criar uma nova editora.
+3. Criar uma nova plataforma.
+4. Criar um jogo usando `editoraId` e `plataformaIds`.
+5. Criar detalhes para esse jogo usando `jogoId`.
+6. Criar um usuario.
+7. Criar um emprestimo usando `usuarioId` e `jogoId`.
+8. Demonstrar uma consulta personalizada e mostrar os links HATEOAS na resposta.
+
+---
+
+## Deploy
+
+O projeto esta publicado no Render:
+
+[https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+
+Para replicar o deploy:
+
+* Configure o projeto no Render usando Docker.
+* Use `games-api` como Root Directory.
+* O Dockerfile compila o projeto com Maven e executa o JAR com Java 21.

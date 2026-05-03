@@ -1,5 +1,6 @@
 package com.meuapi.games_api.controllers;
 
+import com.meuapi.games_api.dto.EditoraRequest;
 import com.meuapi.games_api.entities.Editora;
 import com.meuapi.games_api.exceptions.RecursoNaoEncontradoException;
 import com.meuapi.games_api.repositories.EditoraRepository;
@@ -48,7 +49,7 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editoras listadas com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
+            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
     })
     @Operation(summary = "Lista todas as editoras", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
@@ -59,9 +60,9 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editora encontrada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
+            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
     })
-    @Operation(summary = "Busca uma editora por ID", description = "Retorna os detalhes de uma editora específica")
+    @Operation(summary = "Busca uma editora por ID", description = "Retorna os detalhes de uma editora especifica")
     @GetMapping("/{id}")
     public EntityModel<Editora> buscarPorId(@PathVariable Long id) {
         Editora editora = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
@@ -70,32 +71,33 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Editora cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos")
     })
-    @Operation(summary = "Cadastra uma nova editora", description = "Cria uma editora para vínculo com jogos")
+    @Operation(summary = "Cadastra uma nova editora", description = "Cria uma editora para vinculo com jogos")
     @PostMapping
-    public ResponseEntity<EntityModel<Editora>> criar(@Valid @RequestBody Editora editora) {
-        Editora nova = repository.save(editora);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(nova));
+    public ResponseEntity<EntityModel<Editora>> criar(@Valid @RequestBody EditoraRequest request) {
+        Editora editora = new Editora();
+        editora.setNome(request.nome());
+        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(repository.save(editora)));
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editora atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
     })
     @Operation(summary = "Atualiza uma editora", description = "Permite alterar o nome de uma editora existente")
     @PutMapping("/{id}")
-    public EntityModel<Editora> atualizar(@PathVariable Long id, @Valid @RequestBody Editora nova) {
+    public EntityModel<Editora> atualizar(@PathVariable Long id, @Valid @RequestBody EditoraRequest request) {
         return repository.findById(id).map(editora -> {
-            editora.setNome(nova.getNome());
+            editora.setNome(request.nome());
             return criarModelo(repository.save(editora));
         }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Editora excluída com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
+            @ApiResponse(responseCode = "204", description = "Editora excluida com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
     })
     @Operation(summary = "Exclui uma editora", description = "Remove permanentemente a editora do acervo")
     @DeleteMapping("/{id}")
@@ -109,7 +111,7 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
+            @ApiResponse(responseCode = "400", description = "Parametro invalido")
     })
     @Operation(summary = "Consulta personalizada por nome", description = "Busca editoras por parte do nome")
     @GetMapping("/busca")

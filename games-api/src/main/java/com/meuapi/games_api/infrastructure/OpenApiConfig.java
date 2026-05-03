@@ -11,12 +11,11 @@ import org.springframework.context.annotation.Configuration;
                 title = "GamesBoard API",
                 version = "1.0.0",
                 description = "Sistema completo para gestão de acervos e empréstimos de jogos. " +
-                        "A API implementa **HATEOAS** para navegabilidade, **Paginação** em todas as listagens, " +
-                        "relacionamentos complexos (incluindo **Many-to-Many**) e consultas personalizadas por domínio. " +
-                        "Desenvolvido com Spring Boot 3 e persistência em banco H2.",
+                        "A API implementa HATEOAS para navegabilidade, paginação em todas as listagens, " +
+                        "relacionamentos One-to-One, One-to-Many e Many-to-Many, validacao de dados " +
+                        "e consultas personalizadas por domínio. Desenvolvido com Spring Boot 3 e banco H2.",
                 contact = @Contact(name = "Luana Miyashiro")
         )
 )
-
 public class OpenApiConfig {
 }

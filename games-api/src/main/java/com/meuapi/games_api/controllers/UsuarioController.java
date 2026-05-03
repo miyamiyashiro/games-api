@@ -1,5 +1,6 @@
 package com.meuapi.games_api.controllers;
 
+import com.meuapi.games_api.dto.UsuarioRequest;
 import com.meuapi.games_api.entities.Usuario;
 import com.meuapi.games_api.exceptions.RecursoNaoEncontradoException;
 import com.meuapi.games_api.repositories.UsuarioRepository;
@@ -29,7 +30,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@Tag(name = "Usuários")
+@Tag(name = "Usuarios")
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
@@ -43,32 +44,34 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
+            @ApiResponse(responseCode = "200", description = "Usuarios listados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
     })
-    @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista paginada com links HATEOAS")
+    @Operation(summary = "Lista todos os usuarios", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(Pageable pageable) {
         Page<Usuario> usuarios = repository.findAll(pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(usuarios, this::criarModelo));
     }
 
-    @Operation(summary = "Cadastra um novo usuário", description = "Cria um perfil de cliente para realizar empréstimos")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail já cadastrado")
+            @ApiResponse(responseCode = "201", description = "Usuario cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados invalidos ou e-mail ja cadastrado")
     })
+    @Operation(summary = "Cadastra um novo usuario", description = "Cria um perfil de cliente para realizar emprestimos")
     @PostMapping
-    public ResponseEntity<EntityModel<Usuario>> criar(@Valid @RequestBody Usuario usuario) {
-        Usuario novo = repository.save(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(novo));
+    public ResponseEntity<EntityModel<Usuario>> criar(@Valid @RequestBody UsuarioRequest request) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.nome());
+        usuario.setEmail(request.email());
+        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(repository.save(usuario)));
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
     })
-    @Operation(summary = "Busca usuário por ID", description = "Retorna os detalhes de um usuário específico")
+    @Operation(summary = "Busca usuario por ID", description = "Retorna os detalhes de um usuario especifico")
     @GetMapping("/{id}")
     public EntityModel<Usuario> buscarPorId(@PathVariable Long id) {
         Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
@@ -76,10 +79,10 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "204", description = "Usuario excluido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
     })
-    @Operation(summary = "Deleta usuário", description = "Remove permanentemente o usuário do acervo")
+    @Operation(summary = "Deleta usuario", description = "Remove permanentemente o usuario do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         if (!repository.existsById(id)) {
@@ -90,14 +93,14 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
     })
-    @Operation(summary = "Busca usuário por e-mail", description = "Consulta personalizada por e-mail exato")
+    @Operation(summary = "Busca usuario por e-mail", description = "Consulta personalizada por e-mail exato")
     @GetMapping("/email/{email}")
     public ResponseEntity<EntityModel<Usuario>> buscarPorEmail(@PathVariable String email) {
         Usuario usuario = repository.findByEmail(email)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com e-mail: " + email));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado com e-mail: " + email));
         return ResponseEntity.ok(EntityModel.of(usuario,
                 linkTo(methodOn(UsuarioController.class).buscarPorEmail(email)).withSelfRel(),
                 linkTo(methodOn(UsuarioController.class).buscarPorId(usuario.getId())).withRel("usuario"),
@@ -105,16 +108,16 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuario atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
     })
-    @Operation(summary = "Atualiza dados do usuário", description = "Altera nome ou e-mail de um usuário cadastrado")
+    @Operation(summary = "Atualiza dados do usuario", description = "Altera nome ou e-mail de um usuario cadastrado")
     @PutMapping("/{id}")
-    public EntityModel<Usuario> atualizar(@PathVariable Long id, @Valid @RequestBody Usuario novo) {
+    public EntityModel<Usuario> atualizar(@PathVariable Long id, @Valid @RequestBody UsuarioRequest request) {
         return repository.findById(id).map(usuario -> {
-            usuario.setNome(novo.getNome());
-            usuario.setEmail(novo.getEmail());
+            usuario.setNome(request.nome());
+            usuario.setEmail(request.email());
             return criarModelo(repository.save(usuario));
         }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
     }

@@ -1,0 +1,145 @@
+{
+  "info": {
+    "name": "Games API",
+    "description": "Colecao para demonstrar CRUD, consultas personalizadas e HATEOAS da Games API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://games-api-3rqr.onrender.com"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Listar editoras",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/editoras"
+      }
+    },
+    {
+      "name": "02 - Criar editora",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Devir\"\n}"
+        },
+        "url": "{{baseUrl}}/editoras"
+      }
+    },
+    {
+      "name": "03 - Criar plataforma",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Tabuleiro fisico\"\n}"
+        },
+        "url": "{{baseUrl}}/plataformas"
+      }
+    },
+    {
+      "name": "04 - Criar jogo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Ticket to Ride\",\n  \"categoria\": \"TABULEIRO\",\n  \"editoraId\": 1,\n  \"plataformaIds\": [1]\n}"
+        },
+        "url": "{{baseUrl}}/jogos"
+      }
+    },
+    {
+      "name": "05 - Criar detalhes do jogo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"descricao\": \"Jogo de rotas ferroviarias e estrategia familiar.\",\n  \"idadeMinima\": 8,\n  \"tempoMedioMinutos\": 60,\n  \"jogoId\": 1\n}"
+        },
+        "url": "{{baseUrl}}/detalhes-jogos"
+      }
+    },
+    {
+      "name": "06 - Criar usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Luana Miyashiro\",\n  \"email\": \"luana@email.com\"\n}"
+        },
+        "url": "{{baseUrl}}/usuarios"
+      }
+    },
+    {
+      "name": "07 - Criar emprestimo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataDevolucao\": \"2026-04-20\",\n  \"usuarioId\": 1,\n  \"jogoId\": 1\n}"
+        },
+        "url": "{{baseUrl}}/emprestimos"
+      }
+    },
+    {
+      "name": "08 - Buscar jogo por titulo",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/jogos/busca?titulo=catan"
+      }
+    },
+    {
+      "name": "09 - Buscar usuario por email",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/usuarios/email/luana@email.com"
+      }
+    },
+    {
+      "name": "10 - Buscar emprestimos por data",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/emprestimos/data?data=2026-04-11"
+      }
+    }
+  ]
+}

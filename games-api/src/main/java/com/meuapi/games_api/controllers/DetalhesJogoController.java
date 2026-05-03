@@ -1,8 +1,11 @@
 package com.meuapi.games_api.controllers;
 
+import com.meuapi.games_api.dto.DetalhesJogoRequest;
 import com.meuapi.games_api.entities.DetalhesJogo;
+import com.meuapi.games_api.entities.Jogo;
 import com.meuapi.games_api.exceptions.RecursoNaoEncontradoException;
 import com.meuapi.games_api.repositories.DetalhesJogoRepository;
+import com.meuapi.games_api.repositories.JogoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,30 +37,34 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class DetalhesJogoController {
 
     private final DetalhesJogoRepository repository;
+    private final JogoRepository jogoRepository;
     private final PagedResourcesAssembler<DetalhesJogo> assembler;
 
     @Autowired
-    public DetalhesJogoController(DetalhesJogoRepository repository, PagedResourcesAssembler<DetalhesJogo> assembler) {
+    public DetalhesJogoController(
+            DetalhesJogoRepository repository,
+            JogoRepository jogoRepository,
+            PagedResourcesAssembler<DetalhesJogo> assembler
+    ) {
         this.repository = repository;
+        this.jogoRepository = jogoRepository;
         this.assembler = assembler;
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
+            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
     })
     @Operation(summary = "Lista os detalhes dos jogos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public PagedModel<EntityModel<DetalhesJogo>> listarTodos(Pageable pageable) {
         Page<DetalhesJogo> detalhes = repository.findAll(pageable);
-        return assembler.toModel(detalhes,
-                detalhe -> EntityModel.of(detalhe,
-                        linkTo(methodOn(DetalhesJogoController.class).buscarPorId(detalhe.getId())).withSelfRel()));
+        return assembler.toModel(detalhes, this::criarModelo);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
+            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados")
     })
     @Operation(summary = "Busca detalhes por ID", description = "Retorna os detalhes complementares de um jogo pelo ID")
     @GetMapping("/{id}")
@@ -68,47 +75,45 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados para o jogo informado")
+            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados para o jogo informado")
     })
     @Operation(summary = "Consulta personalizada por jogo", description = "Busca os detalhes complementares pelo ID do jogo")
     @GetMapping("/jogo/{jogoId}")
     public EntityModel<DetalhesJogo> buscarPorJogo(@PathVariable Long jogoId) {
         DetalhesJogo detalhes = repository.findByJogoId(jogoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Detalhes não encontrados para o jogo ID: " + jogoId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Detalhes nao encontrados para o jogo ID: " + jogoId));
         return criarModelo(detalhes);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Detalhes cadastrados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos")
     })
-    @Operation(summary = "Cadastra detalhes de um jogo", description = "Cria o registro One-to-One de detalhes complementares")
+    @Operation(summary = "Cadastra detalhes de um jogo", description = "Cria o registro One-to-One de detalhes complementares usando o ID do jogo")
     @PostMapping
-    public ResponseEntity<EntityModel<DetalhesJogo>> criar(@Valid @RequestBody DetalhesJogo detalhes) {
-        DetalhesJogo novo = repository.save(detalhes);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(novo));
+    public ResponseEntity<EntityModel<DetalhesJogo>> criar(@Valid @RequestBody DetalhesJogoRequest request) {
+        DetalhesJogo novo = new DetalhesJogo();
+        preencherDetalhes(novo, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(repository.save(novo)));
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes atualizados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados")
     })
-    @Operation(summary = "Atualiza detalhes de um jogo", description = "Altera descrição, idade mínima e tempo médio")
+    @Operation(summary = "Atualiza detalhes de um jogo", description = "Altera descricao, idade minima, tempo medio e jogo vinculado")
     @PutMapping("/{id}")
-    public EntityModel<DetalhesJogo> atualizar(@PathVariable Long id, @Valid @RequestBody DetalhesJogo novosDetalhes) {
+    public EntityModel<DetalhesJogo> atualizar(@PathVariable Long id, @Valid @RequestBody DetalhesJogoRequest request) {
         return repository.findById(id).map(detalhes -> {
-            detalhes.setDescricao(novosDetalhes.getDescricao());
-            detalhes.setIdadeMinima(novosDetalhes.getIdadeMinima());
-            detalhes.setTempoMedioMinutos(novosDetalhes.getTempoMedioMinutos());
-            detalhes.setJogo(novosDetalhes.getJogo());
+            preencherDetalhes(detalhes, request);
             return criarModelo(repository.save(detalhes));
         }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Detalhes excluídos com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
+            @ApiResponse(responseCode = "204", description = "Detalhes excluidos com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados")
     })
     @Operation(summary = "Exclui detalhes de um jogo", description = "Remove os detalhes complementares do acervo")
     @DeleteMapping("/{id}")
@@ -118,6 +123,16 @@ public class DetalhesJogoController {
         }
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void preencherDetalhes(DetalhesJogo detalhes, DetalhesJogoRequest request) {
+        Jogo jogo = jogoRepository.findById(request.jogoId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Jogo nao encontrado com ID: " + request.jogoId()));
+
+        detalhes.setDescricao(request.descricao());
+        detalhes.setIdadeMinima(request.idadeMinima());
+        detalhes.setTempoMedioMinutos(request.tempoMedioMinutos());
+        detalhes.setJogo(jogo);
     }
 
     private EntityModel<DetalhesJogo> criarModelo(DetalhesJogo detalhes) {

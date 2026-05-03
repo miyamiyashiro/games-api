@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
         List<String> detalhes = ex.getBindingResult().getFieldErrors().stream()
                 .map(this::formatarErroCampo)
                 .toList();
-        return build(HttpStatus.BAD_REQUEST, "Dados inválidos na requisição", detalhes);
+        return build(HttpStatus.BAD_REQUEST, "Dados invalidos na requisicao", detalhes);
     }
 
     @ExceptionHandler({
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
             DataIntegrityViolationException.class
     })
     public ResponseEntity<ApiError> handleBadRequest(Exception ex) {
-        return build(HttpStatus.BAD_REQUEST, "Não foi possível processar a requisição", List.of(ex.getMessage()));
+        return build(HttpStatus.BAD_REQUEST, "Nao foi possivel processar a requisicao", List.of(ex.getMessage()));
     }
 
     private String formatarErroCampo(FieldError erro) {

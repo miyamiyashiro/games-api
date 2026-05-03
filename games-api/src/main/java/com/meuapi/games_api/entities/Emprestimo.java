@@ -20,21 +20,21 @@ public class Emprestimo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Schema(example = "2026-04-11", description = "Data de empréstimo")
+    @Schema(example = "2026-04-11", description = "Data de emprestimo")
     private LocalDate dataEmprestimo;
 
-    @Schema(example = "2026-04-20", description = "Data prevista para devolução")
+    @Schema(example = "2026-04-20", description = "Data prevista para devolucao")
     private LocalDate dataDevolucao;
 
     @ManyToOne
     @JsonIgnoreProperties("emprestimos")
     @JoinColumn(name = "usuario_id")
-    @NotNull(message = "O usuário é obrigatório")
+    @NotNull(message = "O usuario e obrigatorio")
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "jogo_id")
     @JsonIgnoreProperties({"editora", "plataformas", "detalhes"})
-    @NotNull(message = "O jogo é obrigatório")
+    @NotNull(message = "O jogo e obrigatorio")
     private Jogo jogo;
 }
