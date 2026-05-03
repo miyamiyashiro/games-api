@@ -1,7 +1,12 @@
 package com.meuapi.games_api.controllers;
 
 import com.meuapi.games_api.entities.Usuario;
+import com.meuapi.games_api.exceptions.RecursoNaoEncontradoException;
 import com.meuapi.games_api.repositories.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,14 +14,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @Tag(name = "Usuários")
@@ -33,15 +43,14 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
     })
     @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(Pageable pageable) {
         Page<Usuario> usuarios = repository.findAll(pageable);
-        return ResponseEntity.ok(pagedResourcesAssembler.toModel(usuarios));
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(usuarios, this::criarModelo));
     }
 
     @Operation(summary = "Cadastra um novo usuário", description = "Cria um perfil de cliente para realizar empréstimos")
@@ -52,68 +61,67 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<EntityModel<Usuario>> criar(@Valid @RequestBody Usuario usuario) {
         Usuario novo = repository.save(usuario);
-        EntityModel<Usuario> model = EntityModel.of(novo,
-                linkTo(methodOn(UsuarioController.class).buscarPorId(novo.getId())).withSelfRel(),
-                linkTo(methodOn(UsuarioController.class).listarTodos(null)).withRel("lista"));
-        return ResponseEntity.status(HttpStatus.CREATED).body(model);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(novo));
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Busca usuário por Id", description = "Retorna os detalhes de um usuário específico")
+    @Operation(summary = "Busca usuário por ID", description = "Retorna os detalhes de um usuário específico")
     @GetMapping("/{id}")
     public EntityModel<Usuario> buscarPorId(@PathVariable Long id) {
-        Usuario usuario = repository.findById(id).orElseThrow();
-        return EntityModel.of(usuario,
-                linkTo(methodOn(UsuarioController.class).buscarPorId(id)).withSelfRel());
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
+        return criarModelo(usuario);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Deletar usuário", description = "Remove permanentemente o usuário do acervo")
+    @Operation(summary = "Deleta usuário", description = "Remove permanentemente o usuário do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
-        if (!repository.existsById(id)) return ResponseEntity.notFound().build();
+        if (!repository.existsById(id)) {
+            throw new RecursoNaoEncontradoException(id);
+        }
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Busca um usuário pelo email", description = "Consulta personalizada onde você pode buscar o usuário pelo email")
+    @Operation(summary = "Busca usuário por e-mail", description = "Consulta personalizada por e-mail exato")
     @GetMapping("/email/{email}")
     public ResponseEntity<EntityModel<Usuario>> buscarPorEmail(@PathVariable String email) {
-        Usuario u = repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        return ResponseEntity.ok(EntityModel.of(u,
-                linkTo(methodOn(UsuarioController.class).buscarPorEmail(email)).withSelfRel()));
+        Usuario usuario = repository.findByEmail(email)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com e-mail: " + email));
+        return ResponseEntity.ok(EntityModel.of(usuario,
+                linkTo(methodOn(UsuarioController.class).buscarPorEmail(email)).withSelfRel(),
+                linkTo(methodOn(UsuarioController.class).buscarPorId(usuario.getId())).withRel("usuario"),
+                linkTo(methodOn(UsuarioController.class).listarTodos(null)).withRel("lista")));
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Registro não encontrado")
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @Operation(summary = "Atualiza dados do usuário", description = "Altera nome ou e-mail de um usuário cadastrado")
     @PutMapping("/{id}")
-    public EntityModel<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario novo) {
-        return repository.findById(id).map(u -> {
-            u.setNome(novo.getNome());
-            u.setEmail(novo.getEmail());
-            return EntityModel.of(repository.save(u),
-                    linkTo(methodOn(UsuarioController.class).buscarPorId(id)).withSelfRel());
-        }).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public EntityModel<Usuario> atualizar(@PathVariable Long id, @Valid @RequestBody Usuario novo) {
+        return repository.findById(id).map(usuario -> {
+            usuario.setNome(novo.getNome());
+            usuario.setEmail(novo.getEmail());
+            return criarModelo(repository.save(usuario));
+        }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
+    }
+
+    private EntityModel<Usuario> criarModelo(Usuario usuario) {
+        return EntityModel.of(usuario,
+                linkTo(methodOn(UsuarioController.class).buscarPorId(usuario.getId())).withSelfRel(),
+                linkTo(methodOn(UsuarioController.class).listarTodos(null)).withRel("lista"));
     }
 }

@@ -5,22 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/PlataformaController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Plataforma.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/PlataformaRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/mvnw.cmd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EditoraController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EditoraController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EmprestimoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EmprestimoController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/PlataformaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/PlataformaController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Editora.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Editora.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Emprestimo.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Emprestimo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Jogo.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Jogo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Usuario.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/EditoraRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/EditoraRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/EmprestimoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/EmprestimoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/RecursoNaoEncontradoException.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/RecursoNaoEncontradoException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/LoadDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/LoadDatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +92,6 @@
     <attachedChunks>
       <set>
         <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>
@@ -110,6 +108,9 @@
       <workItem from="1775583305020" duration="2220000" />
       <workItem from="1775594602271" duration="6953000" />
       <workItem from="1775939902928" duration="15499000" />
+      <workItem from="1776199210324" duration="487000" />
+      <workItem from="1776203823158" duration="704000" />
+      <workItem from="1777767226739" duration="640000" />
     </task>
     <servers />
   </component>
