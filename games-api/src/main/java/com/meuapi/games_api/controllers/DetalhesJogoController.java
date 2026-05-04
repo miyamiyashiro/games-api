@@ -27,6 +27,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -87,9 +93,23 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Detalhes cadastrados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
-    @Operation(summary = "Cadastra detalhes de um jogo", description = "Cria o registro One-to-One de detalhes complementares usando o ID do jogo")
+    @Operation(
+            summary = "Cadastra detalhes de um jogo",
+            description = "Cria o registro One-to-One de detalhes complementares usando o ID do jogo",
+            parameters = {
+                    @Parameter(
+                            name = "Idempotency-Key",
+                            description = "Chave única para evitar duplicidade (ex: UUID ou número)",
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string"),
+                            required = false
+                    )
+            }
+    )
     @PostMapping
     public ResponseEntity<EntityModel<DetalhesJogo>> criar(@Valid @RequestBody DetalhesJogoRequest request) {
         DetalhesJogo novo = new DetalhesJogo();

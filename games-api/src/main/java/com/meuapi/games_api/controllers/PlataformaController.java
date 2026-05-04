@@ -27,6 +27,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.List;
 
@@ -71,9 +77,11 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Plataforma cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
-    @Operation(summary = "Cadastra nova plataforma", description = "Cria uma nova plataforma para vinculo com jogos")
+    @Operation(summary = "Cadastra nova plataforma", description = "Cria uma nova plataforma para vinculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping
     public ResponseEntity<EntityModel<Plataforma>> criar(@Valid @RequestBody PlataformaRequest request) {
         Plataforma plataforma = new Plataforma();

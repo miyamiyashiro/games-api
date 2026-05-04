@@ -25,6 +25,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -56,9 +62,11 @@ public class UsuarioController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuario cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos ou e-mail ja cadastrado")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos ou e-mail ja cadastrado"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
-    @Operation(summary = "Cadastra um novo usuario", description = "Cria um perfil de cliente para realizar emprestimos")
+    @Operation(summary = "Cadastra um novo usuario", description = "Cria um perfil de cliente para realizar emprestimos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping
     public ResponseEntity<EntityModel<Usuario>> criar(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = new Usuario();

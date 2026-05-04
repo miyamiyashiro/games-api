@@ -31,6 +31,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -83,10 +89,12 @@ public class EmprestimoController {
         return criarModelo(emprestimo);
     }
 
-    @Operation(summary = "Registra um novo emprestimo", description = "Cria um vinculo entre um usuario e um jogo usando seus IDs")
+    @Operation(summary = "Registra um novo emprestimo", description = "Cria um vinculo entre um usuario e um jogo usando seus IDs", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Emprestimo registrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro de validacao ou falta de dados obrigatorios")
+            @ApiResponse(responseCode = "400", description = "Erro de validacao ou falta de dados obrigatorios"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
     @PostMapping
     public ResponseEntity<EntityModel<Emprestimo>> realizarEmprestimo(@Valid @RequestBody EmprestimoRequest request) {

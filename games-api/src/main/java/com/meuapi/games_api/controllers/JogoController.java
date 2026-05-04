@@ -31,6 +31,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.List;
 
@@ -84,9 +90,23 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Jogo cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia"), // Boa prática adicionar essa!
+            @ApiResponse(responseCode = "200", description = "Operação já realizada (Idempotência)")
     })
-    @Operation(summary = "Cadastra um novo jogo", description = "Cria um novo jogo no acervo usando IDs de editora e plataformas")
+    @Operation(
+            summary = "Cadastra um novo jogo",
+            description = "Cria um novo jogo no acervo usando IDs de editora e plataformas",
+            parameters = {
+                    @Parameter(
+                            name = "Idempotency-Key",
+                            description = "Chave única para evitar duplicidade (ex: 12345)",
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string"),
+                            required = false
+                    )
+            }
+    )
     @PostMapping
     public ResponseEntity<EntityModel<Jogo>> criar(@Valid @RequestBody JogoRequest request) {
         Jogo novo = new Jogo();
