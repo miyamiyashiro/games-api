@@ -49,6 +49,23 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 
 ---
 
+## Recursos Avancados
+
+### Rate Limiting
+
+A API limita cada IP a 10 requisicoes por minuto. Se o limite for excedido, o cliente recebe `HTTP 429 Too Many Requests` e fica bloqueado por 30 segundos.
+
+Headers retornados:
+
+* `X-RateLimit-Limit`: limite total da janela.
+* `X-RateLimit-Remaining`: requisicoes restantes na janela atual.
+* `X-RateLimit-Reset`: momento aproximado de reset da janela, em epoch seconds.
+* `Retry-After`: segundos restantes de bloqueio, enviado nas respostas `429`.
+
+Para testar rapidamente, envie mais de 10 requisicoes seguidas para qualquer endpoint, por exemplo `GET /jogos`.
+
+---
+
 ## Roteiro Sugerido Para Demonstracao
 
 1. Listar editoras e plataformas ja carregadas pela base inicial.

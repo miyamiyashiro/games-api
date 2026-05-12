@@ -18,24 +18,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Filtro de Rate Limiting.
- * Limita cada IP a no máximo MAX_REQUESTS requisições por janela de tempo (WINDOW_MS).
- * Se o limite for excedido, o IP fica bloqueado por BLOCK_MS (30 segundos).
- * Retorna HTTP 429 enquanto bloqueado.
+ * Rate limiting por IP.
+ * Cada IP pode fazer ate MAX_REQUESTS requisicoes por janela de tempo.
+ * Ao exceder o limite, o IP fica bloqueado por 30 segundos e recebe HTTP 429.
  */
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    // Número máximo de requisições permitidas na janela de tempo
     private static final int MAX_REQUESTS = 10;
-
-    // Janela de tempo para contagem (60 segundos)
     private static final long WINDOW_MS = 60_000;
-
-    // Tempo de bloqueio após exceder o limite (30 segundos)
     private static final long BLOCK_MS = 30_000;
+    private static final String HEADER_LIMIT = "X-RateLimit-Limit";
+    private static final String HEADER_REMAINING = "X-RateLimit-Remaining";
+    private static final String HEADER_RESET = "X-RateLimit-Reset";
+    private static final String HEADER_RETRY_AFTER = "Retry-After";
 
-    // Dados por IP: contador de requisições, início da janela e momento do bloqueio
     private static class IpData {
         AtomicInteger count = new AtomicInteger(0);
         long windowStart = System.currentTimeMillis();
@@ -50,55 +47,61 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String ip = obterIpCliente(request);
-        IpData data = ipDataMap.computeIfAbsent(ip, k -> new IpData());
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        long agora = System.currentTimeMillis();
+        String ip = obterIpCliente(request);
+        IpData data = ipDataMap.computeIfAbsent(ip, key -> new IpData());
+        long now = System.currentTimeMillis();
 
         synchronized (data) {
-            // Verifica se o IP está bloqueado
-            if (data.blockedUntil > 0 && agora < data.blockedUntil) {
-                long segundosRestantes = (data.blockedUntil - agora) / 1000;
-                escreverResposta429(response, ip, segundosRestantes);
+            if (data.blockedUntil > 0 && now < data.blockedUntil) {
+                long secondsRemaining = secondsUntil(data.blockedUntil, now);
+                setRateLimitHeaders(response, 0, data.blockedUntil);
+                escreverResposta429(response, ip, secondsRemaining);
                 return;
             }
 
-            // Reseta o bloqueio se já expirou
-            if (data.blockedUntil > 0 && agora >= data.blockedUntil) {
+            if (data.blockedUntil > 0 && now >= data.blockedUntil) {
                 data.blockedUntil = 0;
                 data.count.set(0);
-                data.windowStart = agora;
+                data.windowStart = now;
             }
 
-            // Reseta a janela de contagem se expirou
-            if (agora - data.windowStart > WINDOW_MS) {
+            if (now - data.windowStart >= WINDOW_MS) {
                 data.count.set(0);
-                data.windowStart = agora;
+                data.windowStart = now;
             }
 
-            // Incrementa o contador
-            int requisicoes = data.count.incrementAndGet();
+            int requests = data.count.incrementAndGet();
 
-            // Se excedeu o limite, bloqueia o IP por 30 segundos
-            if (requisicoes > MAX_REQUESTS) {
-                data.blockedUntil = agora + BLOCK_MS;
-                escreverResposta429(response, ip, BLOCK_MS / 1000);
+            if (requests > MAX_REQUESTS) {
+                data.blockedUntil = now + BLOCK_MS;
+                setRateLimitHeaders(response, 0, data.blockedUntil);
+                escreverResposta429(response, ip, secondsUntil(data.blockedUntil, now));
                 return;
             }
 
-            // Adiciona headers informativos
-            response.setHeader("X-RateLimit-Limit", String.valueOf(MAX_REQUESTS));
-            response.setHeader("X-RateLimit-Remaining", String.valueOf(MAX_REQUESTS - requisicoes));
+            long resetAt = data.windowStart + WINDOW_MS;
+            setRateLimitHeaders(response, MAX_REQUESTS - requests, resetAt);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void setRateLimitHeaders(HttpServletResponse response, int remaining, long resetAtMillis) {
+        response.setHeader(HEADER_LIMIT, String.valueOf(MAX_REQUESTS));
+        response.setHeader(HEADER_REMAINING, String.valueOf(Math.max(remaining, 0)));
+        response.setHeader(HEADER_RESET, String.valueOf(resetAtMillis / 1000));
     }
 
     private void escreverResposta429(HttpServletResponse response, String ip, long segundosRestantes)
             throws IOException {
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setHeader("Retry-After", String.valueOf(segundosRestantes));
+        response.setHeader(HEADER_RETRY_AFTER, String.valueOf(segundosRestantes));
 
         Map<String, Object> corpo = Map.of(
                 "timestamp", LocalDateTime.now().toString(),
@@ -109,6 +112,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);
+    }
+
+    private long secondsUntil(long targetMillis, long nowMillis) {
+        return Math.max(1, (long) Math.ceil((targetMillis - nowMillis) / 1000.0));
     }
 
     private String obterIpCliente(HttpServletRequest request) {
