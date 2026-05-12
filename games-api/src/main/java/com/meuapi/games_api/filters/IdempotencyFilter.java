@@ -88,7 +88,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
         if (!entradaAnterior.normalizedBody().equals(entradaAtual.normalizedBody())) {
             escreverRespostaErro(response, HttpStatus.CONFLICT,
-                    "Conflito de idempotência: o corpo da requisição édiferente do original para esta chave.",
+                    "Conflito de idempotência: o corpo da requisição é diferente do original para esta chave.",
                     idempotencyKey);
             return;
         }
@@ -119,7 +119,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         Map<String, Object> corpo = Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 200,
-                "mensagem", "Operacao ja realizada anteriormente. O processamento foi ignorado para evitar duplicidade.",
+                "mensagem", "Operação já realizada anteriormente. O processamento foi ignorado para evitar duplicidade.",
                 "idempotencyKey", chave
         );
 

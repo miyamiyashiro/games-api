@@ -107,7 +107,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 429,
                 "erro", "Too Many Requests",
-                "mensagem", "Voce excedeu o limite de requisicoes. Tente novamente em " + segundosRestantes + " segundos.",
+                "mensagem", "Você excedeu o limite de requisições. Tente novamente em " + segundosRestantes + " segundos.",
                 "detalhes", List.of("IP bloqueado: " + ip, "Retry-After: " + segundosRestantes + "s")
         );
 
