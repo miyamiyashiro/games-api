@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="" />
+    <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/entities/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/IdempotencyFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/IdempotencyFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/RateLimitFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/RateLimitFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/repositories/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/IdempotencyFilterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/IdempotencyFilterTests.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -106,7 +115,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/RateLimitFilter.java</url>
-          <line>100</line>
+          <line>102</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

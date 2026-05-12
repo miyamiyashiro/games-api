@@ -32,6 +32,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import java.util.Map;
+import java.util.UUID;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -73,6 +76,23 @@ public class UsuarioController {
         usuario.setNome(request.nome());
         usuario.setEmail(request.email());
         return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(repository.save(usuario)));
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Chave de API gerada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
+    })
+    @Operation(summary = "Gera chave de API", description = "Cria ou renova a chave usada no header X-API-Key")
+    @PostMapping("/{id}/api-key")
+    public ResponseEntity<Map<String, String>> gerarApiKey(@PathVariable Long id) {
+        Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
+        usuario.setApiKey(UUID.randomUUID().toString());
+        repository.save(usuario);
+
+        return ResponseEntity.ok(Map.of(
+                "usuarioId", usuario.getId().toString(),
+                "apiKey", usuario.getApiKey()
+        ));
     }
 
     @ApiResponses(value = {

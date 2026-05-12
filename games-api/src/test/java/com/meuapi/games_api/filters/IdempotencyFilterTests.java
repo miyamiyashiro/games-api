@@ -9,9 +9,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -52,7 +51,8 @@ class IdempotencyFilterTests {
                                 {"email":"idempotente-1@example.com","nome":"Usuario Idempotente"}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Operacao ja realizada anteriormente")));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.idempotencyKey").value(key));
     }
 
     @Test
@@ -89,6 +89,7 @@ class IdempotencyFilterTests {
                                 }
                                 """))
                 .andExpect(status().isConflict())
-                .andExpect(content().string(containsString("corpo da requisicao e diferente")));
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflict"));
     }
 }

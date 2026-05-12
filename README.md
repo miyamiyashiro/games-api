@@ -51,6 +51,18 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 
 ## Recursos Avancados
 
+### Autenticacao com Chave de API
+
+Operacoes sensiveis de escrita exigem o header `X-API-Key`. As consultas `GET`, o cadastro de usuario e a geracao da chave ficam publicos para permitir o fluxo inicial.
+
+Fluxo sugerido:
+
+1. Crie um usuario com `POST /usuarios`.
+2. Gere a chave com `POST /usuarios/{id}/api-key`.
+3. Envie a chave no header `X-API-Key` ao criar, atualizar ou excluir recursos protegidos.
+
+Se a chave estiver ausente ou invalida, a API retorna `HTTP 401 Unauthorized`.
+
 ### Rate Limiting
 
 A API limita cada IP a 10 requisicoes por minuto. Se o limite for excedido, o cliente recebe `HTTP 429 Too Many Requests` e fica bloqueado por 30 segundos.

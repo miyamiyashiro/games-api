@@ -11,6 +11,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * A mesma Idempotency-Key so pode ser reutilizada para a mesma operacao e o mesmo JSON.
  */
 @Component
+@Order(3)
 public class IdempotencyFilter extends OncePerRequestFilter {
 
     private static final String IDEMPOTENCY_HEADER = "Idempotency-Key";
