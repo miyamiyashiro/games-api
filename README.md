@@ -64,6 +64,19 @@ Headers retornados:
 
 Para testar rapidamente, envie mais de 10 requisicoes seguidas para qualquer endpoint, por exemplo `GET /jogos`.
 
+### Idempotencia
+
+Operacoes `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisicao e enviada mais de uma vez.
+
+Comportamento esperado:
+
+* Chave nova: a API processa normalmente a operacao.
+* Mesma chave, mesmo endpoint e mesmo JSON: a API retorna `HTTP 200 OK` e ignora o novo processamento.
+* Mesma chave com JSON alterado: a API retorna `HTTP 409 Conflict`.
+* Mesma chave usada em outro endpoint ou metodo: a API retorna `HTTP 409 Conflict`.
+
+Para testar, envie duas requisicoes `POST /usuarios` com a mesma `Idempotency-Key`. Na segunda tentativa, altere algum campo do JSON para ver o conflito `409`.
+
 ---
 
 ## Roteiro Sugerido Para Demonstracao

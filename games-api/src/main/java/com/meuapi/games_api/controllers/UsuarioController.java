@@ -50,10 +50,10 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuarios listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros invalidos")
     })
-    @Operation(summary = "Lista todos os usuarios", description = "Retorna uma lista paginada com links HATEOAS")
+    @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(Pageable pageable) {
         Page<Usuario> usuarios = repository.findAll(pageable);
@@ -61,12 +61,12 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos ou e-mail ja cadastrado"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail já cadastrado"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
-    @Operation(summary = "Cadastra um novo usuario", description = "Cria um perfil de cliente para realizar emprestimos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
+    @Operation(summary = "Cadastra um novo usuário", description = "Cria um perfil de cliente para realizar empréstimos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping
     public ResponseEntity<EntityModel<Usuario>> criar(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = new Usuario();
@@ -76,10 +76,10 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Busca usuario por ID", description = "Retorna os detalhes de um usuario especifico")
+    @Operation(summary = "Busca usuario por ID", description = "Retorna os detalhes de um usuário específico")
     @GetMapping("/{id}")
     public EntityModel<Usuario> buscarPorId(@PathVariable Long id) {
         Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
@@ -87,10 +87,10 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuario excluido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
+            @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Deleta usuario", description = "Remove permanentemente o usuario do acervo")
+    @Operation(summary = "Deleta usuário", description = "Remove permanentemente o usuário do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         if (!repository.existsById(id)) {
@@ -101,14 +101,14 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Busca usuario por e-mail", description = "Consulta personalizada por e-mail exato")
+    @Operation(summary = "Busca usuário por e-mail", description = "Consulta personalizada por e-mail exato")
     @GetMapping("/email/{email}")
     public ResponseEntity<EntityModel<Usuario>> buscarPorEmail(@PathVariable String email) {
         Usuario usuario = repository.findByEmail(email)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado com e-mail: " + email));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com e-mail: " + email));
         return ResponseEntity.ok(EntityModel.of(usuario,
                 linkTo(methodOn(UsuarioController.class).buscarPorEmail(email)).withSelfRel(),
                 linkTo(methodOn(UsuarioController.class).buscarPorId(usuario.getId())).withRel("usuario"),
@@ -116,11 +116,11 @@ public class UsuarioController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @Operation(summary = "Atualiza dados do usuario", description = "Altera nome ou e-mail de um usuario cadastrado")
+    @Operation(summary = "Atualiza dados do usuário", description = "Altera nome ou e-mail de um usuário cadastrado")
     @PutMapping("/{id}")
     public EntityModel<Usuario> atualizar(@PathVariable Long id, @Valid @RequestBody UsuarioRequest request) {
         return repository.findById(id).map(usuario -> {

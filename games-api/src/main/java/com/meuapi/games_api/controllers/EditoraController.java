@@ -55,7 +55,7 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editoras listadas com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "400", description = "Parâmetros invalidos")
     })
     @Operation(summary = "Lista todas as editoras", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
@@ -66,7 +66,7 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editora encontrada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
+            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
     })
     @Operation(summary = "Busca uma editora por ID", description = "Retorna os detalhes de uma editora especifica")
     @GetMapping("/{id}")
@@ -77,8 +77,8 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Editora cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
     @Operation(summary = "Cadastra uma nova editora", description = "Cria uma editora para vinculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
@@ -91,8 +91,8 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Editora atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
     })
     @Operation(summary = "Atualiza uma editora", description = "Permite alterar o nome de uma editora existente")
     @PutMapping("/{id}")
@@ -104,8 +104,8 @@ public class EditoraController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Editora excluida com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Editora nao encontrada")
+            @ApiResponse(responseCode = "204", description = "Editora excluída com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Editora não encontrada")
     })
     @Operation(summary = "Exclui uma editora", description = "Remove permanentemente a editora do acervo")
     @DeleteMapping("/{id}")
@@ -119,7 +119,7 @@ public class EditoraController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametro invalido")
+            @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
     })
     @Operation(summary = "Consulta personalizada por nome", description = "Busca editoras por parte do nome")
     @GetMapping("/busca")

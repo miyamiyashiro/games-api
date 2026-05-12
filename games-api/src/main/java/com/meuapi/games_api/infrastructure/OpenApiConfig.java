@@ -21,7 +21,8 @@ import org.springframework.context.annotation.Configuration;
                         "Enquanto o cliente estiver bloqueado, o header Retry-After informa quantos segundos aguardar.\n\n" +
                         "## Idempotencia (HTTP 409)\n" +
                         "Para requisicoes POST, PUT e PATCH, envie o header Idempotency-Key com um UUID unico por operacao. " +
-                        "Se a mesma chave for reutilizada com um body JSON diferente, a API retorna HTTP 409 Conflict.",
+                        "Se a mesma chave for reutilizada no mesmo endpoint com o mesmo JSON, a API ignora o reprocessamento. " +
+                        "Se o JSON, o metodo ou o endpoint forem alterados para a mesma chave, a API retorna HTTP 409 Conflict.",
                 contact = @Contact(name = "Luana Miyashiro")
         )
 )

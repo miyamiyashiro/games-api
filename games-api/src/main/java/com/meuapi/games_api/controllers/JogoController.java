@@ -68,7 +68,7 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Jogos listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
     })
     @Operation(summary = "Lista todos os jogos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
@@ -79,7 +79,7 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Jogo encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Jogo nao encontrado")
+            @ApiResponse(responseCode = "404", description = "Jogo não encontrado")
     })
     @Operation(summary = "Busca um jogo por ID", description = "Retorna os detalhes de um jogo especifico")
     @GetMapping("/{id}")
@@ -90,8 +90,8 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Jogo cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia"), // Boa prática adicionar essa!
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência"), // Boa prática adicionar essa!
             @ApiResponse(responseCode = "200", description = "Operação já realizada (Idempotência)")
     })
     @Operation(
@@ -116,8 +116,8 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Jogo atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Jogo nao encontrado")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Jogo não encontrado")
     })
     @Operation(summary = "Atualiza um jogo", description = "Permite alterar titulo, categoria, editora e plataformas")
     @PutMapping("/{id}")
@@ -131,8 +131,8 @@ public class JogoController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Jogo excluido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Jogo nao encontrado")
+            @ApiResponse(responseCode = "204", description = "Jogo excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Jogo não encontrado")
     })
     @Operation(summary = "Exclui um jogo", description = "Remove permanentemente o jogo do acervo")
     @DeleteMapping("/{id}")
@@ -146,9 +146,9 @@ public class JogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametro invalido")
+            @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
     })
-    @Operation(summary = "Consulta personalizada", description = "Busca jogos por parte do titulo, sem diferenciar maiusculas e minusculas")
+    @Operation(summary = "Consulta personalizada", description = "Busca jogos por parte do título, sem diferenciar maiusculas e minusculas")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Jogo>> buscarPorTitulo(@RequestParam String titulo) {
         List<EntityModel<Jogo>> jogos = repository.findByTituloContainingIgnoreCase(titulo).stream()
@@ -161,11 +161,11 @@ public class JogoController {
 
     private void preencherJogo(Jogo jogo, JogoRequest request) {
         Editora editora = editoraRepository.findById(request.editoraId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Editora nao encontrada com ID: " + request.editoraId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Editora não encontrada com ID: " + request.editoraId()));
         List<Plataforma> plataformas = plataformaRepository.findAllById(request.plataformaIds());
 
         if (plataformas.size() != request.plataformaIds().size()) {
-            throw new RecursoNaoEncontradoException("Uma ou mais plataformas nao foram encontradas");
+            throw new RecursoNaoEncontradoException("Uma ou mais plataformas não foram encontradas");
         }
 
         jogo.setTitulo(request.titulo());

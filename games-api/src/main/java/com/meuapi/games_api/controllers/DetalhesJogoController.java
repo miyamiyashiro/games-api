@@ -59,7 +59,7 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
     })
     @Operation(summary = "Lista os detalhes dos jogos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
@@ -81,7 +81,7 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados para o jogo informado")
+            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados para o jogo informado")
     })
     @Operation(summary = "Consulta personalizada por jogo", description = "Busca os detalhes complementares pelo ID do jogo")
     @GetMapping("/jogo/{jogoId}")
@@ -93,8 +93,8 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Detalhes cadastrados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
     @Operation(
@@ -119,10 +119,10 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes atualizados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
     })
-    @Operation(summary = "Atualiza detalhes de um jogo", description = "Altera descricao, idade minima, tempo medio e jogo vinculado")
+    @Operation(summary = "Atualiza detalhes de um jogo", description = "Altera descrição, idade mínima, tempo médio e jogo vinculado")
     @PutMapping("/{id}")
     public EntityModel<DetalhesJogo> atualizar(@PathVariable Long id, @Valid @RequestBody DetalhesJogoRequest request) {
         return repository.findById(id).map(detalhes -> {
@@ -133,7 +133,7 @@ public class DetalhesJogoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Detalhes excluidos com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes nao encontrados")
+            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
     })
     @Operation(summary = "Exclui detalhes de um jogo", description = "Remove os detalhes complementares do acervo")
     @DeleteMapping("/{id}")

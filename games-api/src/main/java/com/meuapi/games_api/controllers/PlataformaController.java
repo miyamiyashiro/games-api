@@ -55,7 +55,7 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Plataformas listadas com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos")
     })
     @Operation(summary = "Lista todas as plataformas", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
@@ -66,9 +66,9 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Plataforma encontrada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Plataforma nao encontrada")
+            @ApiResponse(responseCode = "404", description = "Plataforma não encontrada")
     })
-    @Operation(summary = "Busca plataforma por ID", description = "Retorna os detalhes de uma plataforma especifica")
+    @Operation(summary = "Busca plataforma por ID", description = "Retorna os detalhes de uma plataforma específica")
     @GetMapping("/{id}")
     public EntityModel<Plataforma> buscar(@PathVariable Long id) {
         Plataforma plataforma = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
@@ -77,11 +77,11 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Plataforma cadastrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
-    @Operation(summary = "Cadastra nova plataforma", description = "Cria uma nova plataforma para vinculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
+    @Operation(summary = "Cadastra nova plataforma", description = "Cria uma nova plataforma para vínculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping
     public ResponseEntity<EntityModel<Plataforma>> criar(@Valid @RequestBody PlataformaRequest request) {
         Plataforma plataforma = new Plataforma();
@@ -91,8 +91,8 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Plataforma atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Plataforma nao encontrada")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Plataforma não encontrada")
     })
     @Operation(summary = "Atualiza uma plataforma", description = "Permite alterar uma plataforma existente")
     @PutMapping("/{id}")
@@ -105,7 +105,7 @@ public class PlataformaController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametro invalido")
+            @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
     })
     @Operation(summary = "Consulta personalizada por nome", description = "Busca plataformas por parte do nome")
     @GetMapping("/busca")
@@ -119,8 +119,8 @@ public class PlataformaController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Plataforma excluida com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Plataforma nao encontrada")
+            @ApiResponse(responseCode = "204", description = "Plataforma excluída com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Plataforma não encontrada")
     })
     @Operation(summary = "Exclui uma plataforma", description = "Remove permanentemente a plataforma do acervo")
     @DeleteMapping("/{id}")

@@ -68,10 +68,10 @@ public class EmprestimoController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Emprestimos listados com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametros invalidos")
+            @ApiResponse(responseCode = "200", description = "Empréstimos listados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros invalidos")
     })
-    @Operation(summary = "Lista todos os emprestimos", description = "Retorna uma lista paginada com links HATEOAS")
+    @Operation(summary = "Lista todos os empréstimos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
     public PagedModel<EntityModel<Emprestimo>> listarTodos(Pageable pageable) {
         Page<Emprestimo> emprestimos = repository.findAll(pageable);
@@ -79,21 +79,21 @@ public class EmprestimoController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Emprestimo encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Emprestimo nao encontrado")
+            @ApiResponse(responseCode = "200", description = "Empréstimo encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
-    @Operation(summary = "Busca um emprestimo por ID", description = "Retorna os detalhes de um emprestimo especifico")
+    @Operation(summary = "Busca um emprestimo por ID", description = "Retorna os detalhes de um empréstimo especifico")
     @GetMapping("/{id}")
     public EntityModel<Emprestimo> buscarPorId(@PathVariable Long id) {
         Emprestimo emprestimo = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
         return criarModelo(emprestimo);
     }
 
-    @Operation(summary = "Registra um novo emprestimo", description = "Cria um vinculo entre um usuario e um jogo usando seus IDs", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
+    @Operation(summary = "Registra um novo empréstimo", description = "Cria um vínculo entre um usuário e um jogo usando seus IDs", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Emprestimo registrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro de validacao ou falta de dados obrigatorios"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotencia (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "201", description = "Empréstimo registrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro de validação ou falta de dados obrigatórios"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
     @PostMapping
@@ -107,11 +107,11 @@ public class EmprestimoController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Emprestimo atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "404", description = "Emprestimo nao encontrado")
+            @ApiResponse(responseCode = "200", description = "Empréstimo atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
-    @Operation(summary = "Atualiza um emprestimo", description = "Permite alterar as datas e os vinculos do emprestimo")
+    @Operation(summary = "Atualiza um empréstimo", description = "Permite alterar as datas e os vínculos do empréstimo")
     @PutMapping("/{id}")
     public EntityModel<Emprestimo> atualizar(@PathVariable Long id, @Valid @RequestBody EmprestimoRequest request) {
         return repository.findById(id).map(emprestimo -> {
@@ -121,10 +121,10 @@ public class EmprestimoController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Emprestimo excluido com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Emprestimo nao encontrado")
+            @ApiResponse(responseCode = "204", description = "Empréstimo excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
-    @Operation(summary = "Exclui um emprestimo", description = "Remove permanentemente o emprestimo do acervo")
+    @Operation(summary = "Exclui um empréstimo", description = "Remove permanentemente o empréstimo do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         if (!repository.existsById(id)) {
@@ -136,9 +136,9 @@ public class EmprestimoController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Parametro invalido")
+            @ApiResponse(responseCode = "400", description = "ParÂmetro inválido")
     })
-    @Operation(summary = "Busca emprestimos por data", description = "Consulta personalizada pela data de emprestimo")
+    @Operation(summary = "Busca empréstimos por data", description = "Consulta personalizada pela data de empréstimo")
     @GetMapping("/data")
     public CollectionModel<EntityModel<Emprestimo>> buscarPorData(@RequestParam LocalDate data) {
         List<EntityModel<Emprestimo>> emprestimos = repository.findByDataEmprestimo(data).stream()
@@ -151,9 +151,9 @@ public class EmprestimoController {
 
     private void preencherEmprestimo(Emprestimo emprestimo, EmprestimoRequest request) {
         Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado com ID: " + request.usuarioId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com ID: " + request.usuarioId()));
         Jogo jogo = jogoRepository.findById(request.jogoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Jogo nao encontrado com ID: " + request.jogoId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Jogo não encontrado com ID: " + request.jogoId()));
 
         emprestimo.setDataEmprestimo(request.dataEmprestimo());
         emprestimo.setDataDevolucao(request.dataDevolucao());
