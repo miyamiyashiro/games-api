@@ -16,12 +16,23 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+/**
+ * Filtro de autenticação por API Key (X-API-Key).
+ *
+ * Endpoints protegidos: POST, PUT, DELETE em qualquer rota,
+ * exceto criação de usuário e geração de chave.
+ * Retorna 401 Unauthorized se a chave estiver ausente ou inválida.
+ */
 @Component
 @Order(2)
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     public static final String API_KEY_HEADER = "X-API-Key";
+
+    // Métodos HTTP que exigem autenticação
+    private static final Set<String> METODOS_PROTEGIDOS = Set.of("POST", "PUT", "PATCH", "DELETE");
 
     private final UsuarioRepository usuarioRepository;
     private final ObjectMapper objectMapper;
@@ -43,8 +54,15 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
         String apiKey = request.getHeader(API_KEY_HEADER);
 
-        if (apiKey == null || apiKey.isBlank() || usuarioRepository.findByApiKey(apiKey).isEmpty()) {
-            escreverRespostaNaoAutorizada(response);
+        // Chave ausente ou em branco → 401
+        if (apiKey == null || apiKey.isBlank()) {
+            escreverRespostaNaoAutorizada(response, "Header X-API-Key nao informado.");
+            return;
+        }
+
+        // Chave não encontrada no banco → 401
+        if (usuarioRepository.findByApiKey(apiKey).isEmpty()) {
+            escreverRespostaNaoAutorizada(response, "Chave de API invalida ou inexistente.");
             return;
         }
 
@@ -52,27 +70,35 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     private boolean deveAutenticar(HttpServletRequest request) {
-        String metodo = request.getMethod();
+        String metodo = request.getMethod().toUpperCase();
         String path = request.getRequestURI();
 
-        if ("OPTIONS".equalsIgnoreCase(metodo) || "GET".equalsIgnoreCase(metodo)) {
+        // Apenas métodos de escrita são protegidos
+        if (!METODOS_PROTEGIDOS.contains(metodo)) {
             return false;
         }
 
+        // Rotas do Swagger e H2 console ficam livres
         if (path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/h2-console")) {
             return false;
         }
 
-        if ("POST".equalsIgnoreCase(metodo) && "/usuarios".equals(path)) {
+        // POST /usuarios → criar usuário não requer chave (bootstrap)
+        if ("POST".equals(metodo) && path.equals("/usuarios")) {
             return false;
         }
 
-        return !("POST".equalsIgnoreCase(metodo) && path.matches("/usuarios/\\d+/api-key"));
+        // POST /usuarios/{id}/api-key → gerar chave não requer chave
+        if ("POST".equals(metodo) && path.matches("/usuarios/\\d+/api-key")) {
+            return false;
+        }
+
+        return true;
     }
 
-    private void escreverRespostaNaoAutorizada(HttpServletResponse response) throws IOException {
+    private void escreverRespostaNaoAutorizada(HttpServletResponse response, String detalhe) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
@@ -80,8 +106,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 401,
                 "erro", "Unauthorized",
-                "mensagem", "Informe uma chave de API valida no header X-API-Key.",
-                "detalhes", List.of("Header obrigatorio: " + API_KEY_HEADER)
+                "mensagem", "Acesso negado: informe uma chave de API valida no header X-API-Key.",
+                "detalhes", List.of(detalhe, "Gere sua chave em: POST /usuarios/{id}/api-key")
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);

@@ -11,6 +11,7 @@ import com.meuapi.games_api.repositories.PlataformaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Jogos")
 @RequestMapping("/jogos")
 public class JogoController {
@@ -147,7 +149,9 @@ public class JogoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
-    })
+    ,
+        @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
+})
     @Operation(summary = "Consulta personalizada", description = "Busca jogos por parte do título, sem diferenciar maiusculas e minusculas")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Jogo>> buscarPorTitulo(@RequestParam String titulo) {

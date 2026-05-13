@@ -7,6 +7,7 @@ import com.meuapi.games_api.repositories.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Usuarios")
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -138,7 +140,8 @@ public class UsuarioController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
     })
     @Operation(summary = "Atualiza dados do usuário", description = "Altera nome ou e-mail de um usuário cadastrado")
     @PutMapping("/{id}")
@@ -147,7 +150,8 @@ public class UsuarioController {
             usuario.setNome(request.nome());
             usuario.setEmail(request.email());
             return criarModelo(repository.save(usuario));
-        }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
+
+}).orElseThrow(() -> new RecursoNaoEncontradoException(id));
     }
 
     private EntityModel<Usuario> criarModelo(Usuario usuario) {

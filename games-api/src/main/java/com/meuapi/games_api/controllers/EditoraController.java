@@ -7,6 +7,7 @@ import com.meuapi.games_api.repositories.EditoraRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Editoras")
 @RequestMapping("/editoras")
 public class EditoraController {
@@ -120,7 +122,9 @@ public class EditoraController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Parâmetro inválido")
-    })
+    ,
+        @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
+})
     @Operation(summary = "Consulta personalizada por nome", description = "Busca editoras por parte do nome")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Editora>> buscarPorNome(@RequestParam String nome) {

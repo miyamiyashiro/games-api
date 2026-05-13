@@ -11,6 +11,7 @@ import com.meuapi.games_api.repositories.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Emprestimos")
 @RequestMapping("/emprestimos")
 public class EmprestimoController {
@@ -137,7 +139,9 @@ public class EmprestimoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso"),
             @ApiResponse(responseCode = "400", description = "ParÂmetro inválido")
-    })
+    ,
+        @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
+})
     @Operation(summary = "Busca empréstimos por data", description = "Consulta personalizada pela data de empréstimo")
     @GetMapping("/data")
     public CollectionModel<EntityModel<Emprestimo>> buscarPorData(@RequestParam LocalDate data) {

@@ -7,6 +7,7 @@ import com.meuapi.games_api.repositories.PlataformaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +122,9 @@ public class PlataformaController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Plataforma excluída com sucesso"),
             @ApiResponse(responseCode = "404", description = "Plataforma não encontrada")
-    })
+    ,
+        @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
+})
     @Operation(summary = "Exclui uma plataforma", description = "Remove permanentemente a plataforma do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {

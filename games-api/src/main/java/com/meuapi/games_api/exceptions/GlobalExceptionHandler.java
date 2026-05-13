@@ -17,9 +17,17 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<ApiError> handleNotFound(RecursoNaoEncontradoException ex) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), List.of());
+    }
+
+    // HTTP 401 – Não autorizado (API Key ausente ou inválida via código)
+    @ExceptionHandler(NaoAutorizadoException.class)
+    public ResponseEntity<ApiError> handleUnauthorized(NaoAutorizadoException ex) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(),
+                List.of("Informe uma chave valida no header X-API-Key"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -56,6 +64,5 @@ public class GlobalExceptionHandler {
             String erro,
             String mensagem,
             List<String> detalhes
-    ) {
-    }
+    ) {}
 }

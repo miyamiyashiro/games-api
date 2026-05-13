@@ -9,6 +9,7 @@ import com.meuapi.games_api.repositories.JogoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Detalhes dos Jogos")
 @RequestMapping("/detalhes-jogos")
 public class DetalhesJogoController {
@@ -134,7 +136,9 @@ public class DetalhesJogoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Detalhes excluidos com sucesso"),
             @ApiResponse(responseCode = "404", description = "Detalhes não encontrados")
-    })
+    ,
+        @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
+})
     @Operation(summary = "Exclui detalhes de um jogo", description = "Remove os detalhes complementares do acervo")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
