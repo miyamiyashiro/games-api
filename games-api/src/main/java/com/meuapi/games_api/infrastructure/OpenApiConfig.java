@@ -38,7 +38,9 @@ import org.springframework.context.annotation.Configuration;
                         "Se a mesma chave for reutilizada com JSON diferente, retorna **409 Conflict**.\n\n" +
                         "## CORS\n" +
                         "A API aceita requisicoes cross-origin e libera os headers `X-API-Key` e `Idempotency-Key`. " +
-                        "Tambem expoe os headers de rate limit e autenticacao para clientes web.",
+                        "Tambem expoe os headers de rate limit e autenticacao para clientes web.\n\n" +
+                        "## Versionamento\n" +
+                        "A API demonstra versionamento por URL nos endpoints `GET /api/v1/status` e `GET /api/v2/status`.",
                 contact = @Contact(name = "Luana Miyashiro")
         ),
         security = @SecurityRequirement(name = "ApiKeyAuth")

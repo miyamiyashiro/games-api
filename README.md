@@ -100,6 +100,13 @@ Configuracao aplicada:
 * Headers permitidos: `Content-Type`, `Accept`, `Authorization`, `X-API-Key` e `Idempotency-Key`.
 * Headers expostos: headers de rate limit, `Retry-After` e `WWW-Authenticate`.
 
+### Versionamento
+
+A API demonstra versionamento por URL com duas versoes do endpoint de status:
+
+* `GET /api/v1/status`: contrato simples com versao, status e mensagem.
+* `GET /api/v2/status`: contrato expandido com informacoes dos recursos avancados.
+
 ---
 
 ## Roteiro Sugerido Para Demonstracao
