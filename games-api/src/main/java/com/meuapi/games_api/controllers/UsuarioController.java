@@ -5,9 +5,11 @@ import com.meuapi.games_api.entities.Usuario;
 import com.meuapi.games_api.exceptions.RecursoNaoEncontradoException;
 import com.meuapi.games_api.repositories.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +28,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +36,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@SecurityRequirement(name = "ApiKeyAuth")
 @Tag(name = "Usuarios")
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -150,8 +145,7 @@ public class UsuarioController {
             usuario.setNome(request.nome());
             usuario.setEmail(request.email());
             return criarModelo(repository.save(usuario));
-
-}).orElseThrow(() -> new RecursoNaoEncontradoException(id));
+        }).orElseThrow(() -> new RecursoNaoEncontradoException(id));
     }
 
     private EntityModel<Usuario> criarModelo(Usuario usuario) {

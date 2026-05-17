@@ -30,6 +30,7 @@ import java.util.Set;
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     public static final String API_KEY_HEADER = "X-API-Key";
+    private static final String AUTHENTICATE_HEADER = "WWW-Authenticate";
 
     // Métodos HTTP que exigem autenticação
     private static final Set<String> METODOS_PROTEGIDOS = Set.of("POST", "PUT", "PATCH", "DELETE");
@@ -101,6 +102,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private void escreverRespostaNaoAutorizada(HttpServletResponse response, String detalhe) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setHeader(AUTHENTICATE_HEADER, "ApiKey realm=\"Games API\"");
 
         Map<String, Object> corpo = Map.of(
                 "timestamp", LocalDateTime.now().toString(),

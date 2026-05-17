@@ -89,6 +89,17 @@ Comportamento esperado:
 
 Para testar, envie duas requisicoes `POST /usuarios` com a mesma `Idempotency-Key`. Na segunda tentativa, altere algum campo do JSON para ver o conflito `409`.
 
+### CORS
+
+A API permite requisicoes cross-origin para todos os endpoints, incluindo chamadas feitas por frontends web.
+
+Configuracao aplicada:
+
+* Origens permitidas: qualquer origem (`*`).
+* Metodos permitidos: `GET`, `POST`, `PUT`, `PATCH`, `DELETE` e `OPTIONS`.
+* Headers permitidos: `Content-Type`, `Accept`, `Authorization`, `X-API-Key` e `Idempotency-Key`.
+* Headers expostos: headers de rate limit, `Retry-After` e `WWW-Authenticate`.
+
 ---
 
 ## Roteiro Sugerido Para Demonstracao
