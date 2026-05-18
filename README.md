@@ -1,11 +1,58 @@
 # Games API
 
 > **Status do Projeto:** LIVE  
-> **Documentacao Oficial:** [Swagger UI](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+> **Documentacao Oficial:** [Swagger UI](https://games-api-3rqr.onrender.com/swagger-ui/index.html)  
+> **Colecao Postman:** [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json)
 
-API desenvolvida para gestao de acervos de jogos de tabuleiro e RPG, com foco em REST, HATEOAS, validacao de dados, documentacao OpenAPI e deploy conteinerizado.
+API desenvolvida para gestao de acervos e emprestimos de jogos de tabuleiro e RPG, com foco nos requisitos do projeto final: REST, relacionamentos JPA, HATEOAS, validacao, documentacao OpenAPI, deploy, autenticacao por API Key, idempotencia, rate limiting, CORS e versionamento.
 
 Autora: Luana Miyashiro Salles de Oliveira
+
+---
+
+## Links
+
+* **Swagger UI:** <https://games-api-3rqr.onrender.com/swagger-ui/index.html>
+* **Base da API:** <https://games-api-3rqr.onrender.com>
+* **Endpoint versionado v1:** <https://games-api-3rqr.onrender.com/api/v1/status>
+* **Endpoint versionado v2:** <https://games-api-3rqr.onrender.com/api/v2/status>
+
+---
+
+## Checklist da Parte I
+
+| Requisito | Como foi atendido |
+| :--- | :--- |
+| Projeto Maven | Projeto Spring Boot com `pom.xml` e Maven Wrapper |
+| API REST | Controllers REST para jogos, usuarios, editoras, plataformas, emprestimos e detalhes |
+| CRUD | Recursos principais possuem operacoes de criacao, consulta, atualizacao e exclusao |
+| HATEOAS | Respostas usam `EntityModel`, `CollectionModel` e `PagedModel` com links |
+| Paginacao | Listagens usam `Pageable` e `PagedResourcesAssembler` |
+| One-to-One | `Jogo` possui `DetalhesJogo` |
+| One-to-Many | `Editora` possui varios `Jogo`; `Usuario` possui varios `Emprestimo` |
+| Many-to-One | `Jogo` pertence a uma `Editora`; `Emprestimo` pertence a um `Usuario` e a um `Jogo` |
+| Many-to-Many | `Jogo` possui varias `Plataforma` e `Plataforma` possui varios `Jogo` |
+| Enum | `Categoria` classifica os jogos |
+| Validacao | DTOs de entrada usam Bean Validation, como `@NotBlank`, `@Email`, `@Size`, `@NotNull`, `@Min` e `@Max` |
+| Consultas personalizadas | Busca por titulo, e-mail, nome, data e ID do jogo |
+| Tratamento de erros | `GlobalExceptionHandler` padroniza respostas de erro |
+| Swagger/OpenAPI | Documentacao disponivel em `/swagger-ui/index.html` |
+| Postman | Colecao com roteiro de testes da Parte I e Parte II |
+| Deploy | API publicada no Render com Docker |
+
+---
+
+## Checklist da Parte II
+
+| Requisito | Como foi atendido |
+| :--- | :--- |
+| `HTTP 401 Unauthorized` | Escritas protegidas exigem `X-API-Key`; chave ausente ou invalida retorna `401` |
+| API Key | Usuario cria conta, gera chave em `POST /usuarios/{id}/api-key` e usa o header `X-API-Key` |
+| `HTTP 429 Too Many Requests` | Rate limit por IP com bloqueio de 30 segundos ao exceder o limite |
+| Idempotencia | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
+| `HTTP 409 Conflict` | Mesma chave de idempotencia com JSON diferente retorna `409` |
+| CORS | Permite chamadas web, headers customizados e metodos REST |
+| Versionamento | Dois contratos versionados: `GET /api/v1/status` e `GET /api/v2/status` |
 
 ---
 
@@ -13,13 +60,13 @@ Autora: Luana Miyashiro Salles de Oliveira
 
 O sistema foi modelado para demonstrar os principais tipos de relacionamento exigidos na avaliacao:
 
-* **Jogo**: registro central do acervo, com titulo, categoria, editora, plataformas e detalhes complementares.
-* **DetalhesJogo**: informacoes complementares de um jogo, em relacionamento One-to-One com Jogo.
-* **Usuario**: cliente que pode realizar emprestimos.
-* **Editora**: publicadora dos jogos, em relacionamento One-to-Many com Jogo.
-* **Emprestimo**: controle de retirada e devolucao, em relacionamento Many-to-One com Usuario e Jogo.
-* **Plataforma**: meio ou sistema onde o jogo esta disponivel, em relacionamento Many-to-Many com Jogo.
-* **Categoria**: enum com os tipos de jogos cadastrados.
+* **Jogo:** registro central do acervo, com titulo, categoria, editora, plataformas e detalhes complementares.
+* **DetalhesJogo:** informacoes complementares de um jogo, em relacionamento One-to-One com Jogo.
+* **Usuario:** cliente que pode realizar emprestimos e gerar uma chave de API.
+* **Editora:** publicadora dos jogos, em relacionamento One-to-Many com Jogo.
+* **Emprestimo:** controle de retirada e devolucao, em relacionamento Many-to-One com Usuario e Jogo.
+* **Plataforma:** meio ou sistema onde o jogo esta disponivel, em relacionamento Many-to-Many com Jogo.
+* **Categoria:** enum com os tipos de jogos cadastrados.
 
 ---
 
@@ -27,35 +74,40 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 
 * Java 21
 * Spring Boot 3.4.1
+* Maven
+* Spring Web
 * Spring Data JPA / Hibernate
 * H2 Database
 * Bean Validation
 * Spring HATEOAS
 * Springdoc OpenAPI / Swagger
 * Docker
+* Render
 
 ---
 
 ## Principais Endpoints
 
-| Recurso | Consulta personalizada | Exemplo |
+| Recurso | Endpoint | Observacao |
 | :--- | :--- | :--- |
-| `Jogos` | Busca por parte do titulo | `GET /jogos/busca?titulo=catan` |
-| `Usuarios` | Busca exata por e-mail | `GET /usuarios/email/luana@email.com` |
-| `Editoras` | Busca por parte do nome | `GET /editoras/busca?nome=galapagos` |
-| `Plataformas` | Busca por parte do nome | `GET /plataformas/busca?nome=tabuleiro` |
-| `Emprestimos` | Filtro por data | `GET /emprestimos/data?data=2026-04-11` |
-| `DetalhesJogo` | Busca pelo ID do jogo | `GET /detalhes-jogos/jogo/1` |
+| Jogos | `GET /jogos?page=0&size=5` | Lista paginada com HATEOAS |
+| Jogos | `GET /jogos/busca?titulo=catan` | Consulta personalizada por titulo |
+| Usuarios | `GET /usuarios/email/luana@email.com` | Consulta personalizada por e-mail |
+| Editoras | `GET /editoras/busca?nome=galapagos` | Consulta personalizada por nome |
+| Plataformas | `GET /plataformas/busca?nome=tabuleiro` | Consulta personalizada por nome |
+| Emprestimos | `GET /emprestimos/data?data=2026-04-11` | Consulta personalizada por data |
+| DetalhesJogo | `GET /detalhes-jogos/jogo/1` | Consulta personalizada pelo ID do jogo |
+| API Key | `POST /usuarios/{id}/api-key` | Gera a chave usada no header `X-API-Key` |
+| Versionamento | `GET /api/v1/status` | Versao simples do endpoint |
+| Versionamento | `GET /api/v2/status` | Versao expandida do endpoint |
 
 ---
 
-## Recursos Avancados
-
-### Autenticacao com Chave de API
+## Autenticacao com Chave de API
 
 Operacoes sensiveis de escrita exigem o header `X-API-Key`. As consultas `GET`, o cadastro de usuario e a geracao da chave ficam publicos para permitir o fluxo inicial.
 
-Fluxo sugerido:
+Fluxo:
 
 1. Crie um usuario com `POST /usuarios`.
 2. Gere a chave com `POST /usuarios/{id}/api-key`.
@@ -63,7 +115,34 @@ Fluxo sugerido:
 
 Se a chave estiver ausente ou invalida, a API retorna `HTTP 401 Unauthorized`.
 
-### Rate Limiting
+Exemplo de header:
+
+```http
+X-API-Key: sua-chave-gerada
+```
+
+---
+
+## Idempotencia
+
+Operacoes `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisicao e enviada mais de uma vez.
+
+Comportamento esperado:
+
+* Chave nova: a API processa normalmente a operacao.
+* Mesma chave, mesmo endpoint e mesmo JSON: a API retorna `HTTP 200 OK` e ignora o novo processamento.
+* Mesma chave com JSON alterado: a API retorna `HTTP 409 Conflict`.
+* Mesma chave usada em outro endpoint ou metodo: a API retorna `HTTP 409 Conflict`.
+
+Exemplo de header:
+
+```http
+Idempotency-Key: demo-idempotencia-001
+```
+
+---
+
+## Rate Limiting
 
 A API limita cada IP a 10 requisicoes por minuto. Se o limite for excedido, o cliente recebe `HTTP 429 Too Many Requests` e fica bloqueado por 30 segundos.
 
@@ -76,20 +155,9 @@ Headers retornados:
 
 Para testar rapidamente, envie mais de 10 requisicoes seguidas para qualquer endpoint, por exemplo `GET /jogos`.
 
-### Idempotencia
+---
 
-Operacoes `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisicao e enviada mais de uma vez.
-
-Comportamento esperado:
-
-* Chave nova: a API processa normalmente a operacao.
-* Mesma chave, mesmo endpoint e mesmo JSON: a API retorna `HTTP 200 OK` e ignora o novo processamento.
-* Mesma chave com JSON alterado: a API retorna `HTTP 409 Conflict`.
-* Mesma chave usada em outro endpoint ou metodo: a API retorna `HTTP 409 Conflict`.
-
-Para testar, envie duas requisicoes `POST /usuarios` com a mesma `Idempotency-Key`. Na segunda tentativa, altere algum campo do JSON para ver o conflito `409`.
-
-### CORS
+## CORS
 
 A API permite requisicoes cross-origin para todos os endpoints, incluindo chamadas feitas por frontends web.
 
@@ -100,7 +168,9 @@ Configuracao aplicada:
 * Headers permitidos: `Content-Type`, `Accept`, `Authorization`, `X-API-Key` e `Idempotency-Key`.
 * Headers expostos: headers de rate limit, `Retry-After` e `WWW-Authenticate`.
 
-### Versionamento
+---
+
+## Versionamento
 
 A API demonstra versionamento por URL com duas versoes do endpoint de status:
 
@@ -109,16 +179,30 @@ A API demonstra versionamento por URL com duas versoes do endpoint de status:
 
 ---
 
-## Roteiro Sugerido Para Demonstracao
+## Roteiro Para Demonstracao
 
-1. Listar editoras e plataformas ja carregadas pela base inicial.
-2. Criar uma nova editora.
-3. Criar uma nova plataforma.
-4. Criar um jogo usando `editoraId` e `plataformaIds`.
-5. Criar detalhes para esse jogo usando `jogoId`.
-6. Criar um usuario.
-7. Criar um emprestimo usando `usuarioId` e `jogoId`.
-8. Demonstrar uma consulta personalizada e mostrar os links HATEOAS na resposta.
+1. Abrir o Swagger em <https://games-api-3rqr.onrender.com/swagger-ui/index.html>.
+2. Mostrar a descricao inicial com os requisitos da Parte I e Parte II.
+3. Executar `GET /jogos?page=0&size=5` e mostrar paginacao e links HATEOAS.
+4. Executar uma consulta personalizada, como `GET /jogos/busca?titulo=catan`.
+5. Criar um usuario com `POST /usuarios`.
+6. Gerar a chave com `POST /usuarios/{id}/api-key`.
+7. Tentar criar uma editora sem `X-API-Key` e demonstrar o erro `401`.
+8. Repetir a criacao com `X-API-Key` e demonstrar sucesso.
+9. Enviar duas requisicoes com a mesma `Idempotency-Key`, alterando o JSON na segunda, e demonstrar `409`.
+10. Enviar mais de 10 requisicoes seguidas para demonstrar `429` e o header `Retry-After`.
+11. Mostrar o preflight `OPTIONS` na colecao Postman para demonstrar CORS.
+12. Comparar `GET /api/v1/status` com `GET /api/v2/status` para demonstrar versionamento.
+
+---
+
+## Como Usar a Colecao Postman
+
+1. Importe o arquivo [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json).
+2. Confirme se a variavel `baseUrl` esta como `https://games-api-3rqr.onrender.com`.
+3. Execute primeiro a pasta **Parte II - API Key 401** para criar usuario e salvar a `apiKey`.
+4. Execute a pasta **Parte II - Idempotencia 409** para demonstrar conflito por JSON alterado.
+5. Execute varias vezes a requisicao da pasta **Parte II - Rate Limiting 429** para acionar o bloqueio.
 
 ---
 
@@ -126,7 +210,7 @@ A API demonstra versionamento por URL com duas versoes do endpoint de status:
 
 O projeto esta publicado no Render:
 
-[https://games-api-3rqr.onrender.com/swagger-ui/index.html](https://games-api-3rqr.onrender.com/swagger-ui/index.html)
+<https://games-api-3rqr.onrender.com/swagger-ui/index.html>
 
 Para replicar o deploy:
 

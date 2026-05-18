@@ -1,145 +1,420 @@
 {
   "info": {
     "name": "Games API",
-    "description": "Colecao para demonstrar CRUD, consultas personalizadas e HATEOAS da Games API.",
+    "description": "Colecao para demonstrar os requisitos da Parte I e Parte II da Games API: CRUD, consultas personalizadas, HATEOAS, API Key, idempotencia, rate limiting, CORS e versionamento.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "https://games-api-3rqr.onrender.com"
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": ""
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "demo-idempotencia-001"
+    },
+    {
+      "key": "idempotencyEmail",
+      "value": "idempotencia-demo-001@email.com"
     }
   ],
   "item": [
     {
-      "name": "01 - Listar editoras",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/editoras"
-      }
-    },
-    {
-      "name": "02 - Criar editora",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+      "name": "Parte I - Recursos REST",
+      "item": [
+        {
+          "name": "01 - Listar jogos com paginacao e HATEOAS",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/jogos?page=0&size=5"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Devir\"\n}"
         },
-        "url": "{{baseUrl}}/editoras"
-      }
-    },
-    {
-      "name": "03 - Criar plataforma",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        {
+          "name": "02 - Buscar jogo por titulo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/jogos/busca?titulo=catan"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Tabuleiro fisico\"\n}"
         },
-        "url": "{{baseUrl}}/plataformas"
-      }
-    },
-    {
-      "name": "04 - Criar jogo",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        {
+          "name": "03 - Listar editoras",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/editoras"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"titulo\": \"Ticket to Ride\",\n  \"categoria\": \"TABULEIRO\",\n  \"editoraId\": 1,\n  \"plataformaIds\": [1]\n}"
         },
-        "url": "{{baseUrl}}/jogos"
-      }
-    },
-    {
-      "name": "05 - Criar detalhes do jogo",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        {
+          "name": "04 - Buscar editora por nome",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/editoras/busca?nome=galapagos"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"descricao\": \"Jogo de rotas ferroviarias e estrategia familiar.\",\n  \"idadeMinima\": 8,\n  \"tempoMedioMinutos\": 60,\n  \"jogoId\": 1\n}"
         },
-        "url": "{{baseUrl}}/detalhes-jogos"
-      }
-    },
-    {
-      "name": "06 - Criar usuario",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        {
+          "name": "05 - Listar plataformas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/plataformas"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"Luana Miyashiro\",\n  \"email\": \"luana@email.com\"\n}"
         },
-        "url": "{{baseUrl}}/usuarios"
-      }
-    },
-    {
-      "name": "07 - Criar emprestimo",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        {
+          "name": "06 - Buscar plataforma por nome",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/plataformas/busca?nome=tabuleiro"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"dataDevolucao\": \"2026-04-20\",\n  \"usuarioId\": 1,\n  \"jogoId\": 1\n}"
         },
-        "url": "{{baseUrl}}/emprestimos"
-      }
+        {
+          "name": "07 - Buscar usuario por email",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/usuarios/email/luana@email.com"
+          }
+        },
+        {
+          "name": "08 - Buscar emprestimos por data",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/emprestimos/data?data=2026-04-11"
+          }
+        },
+        {
+          "name": "09 - Buscar detalhes pelo ID do jogo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/detalhes-jogos/jogo/1"
+          }
+        }
+      ]
     },
     {
-      "name": "08 - Buscar jogo por titulo",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/jogos/busca?titulo=catan"
-      }
+      "name": "Parte II - API Key 401",
+      "item": [
+        {
+          "name": "01 - Criar usuario publico para gerar API Key",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('demoEmail', 'postman-' + Date.now() + '@email.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Usuario criado', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('usuarioId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "criar-usuario-api-key-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuario Postman\",\n  \"email\": \"{{demoEmail}}\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "02 - Gerar API Key do usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API Key gerada', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('apiKey', json.apiKey);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}/api-key"
+          }
+        },
+        {
+          "name": "03 - Tentar criar editora sem X-API-Key deve retornar 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Retorna 401 sem API Key', function () {",
+                  "  pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "editora-sem-chave-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Editora Sem Chave\"\n}"
+            },
+            "url": "{{baseUrl}}/editoras"
+          }
+        },
+        {
+          "name": "04 - Criar editora com X-API-Key deve funcionar",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('editoraNome', 'Editora API Key ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Criacao autorizada', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "editora-com-chave-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{editoraNome}}\"\n}"
+            },
+            "url": "{{baseUrl}}/editoras"
+          }
+        }
+      ]
     },
     {
-      "name": "09 - Buscar usuario por email",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/usuarios/email/luana@email.com"
-      }
+      "name": "Parte II - Idempotencia 409",
+      "item": [
+        {
+          "name": "01 - Primeira requisicao com Idempotency-Key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Primeira tentativa processada', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Idempotencia Original\",\n  \"email\": \"{{idempotencyEmail}}\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "02 - Mesma chave com JSON alterado deve retornar 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Retorna 409 com JSON alterado', function () {",
+                  "  pm.expect(pm.response.code).to.eql(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Idempotencia Alterada\",\n  \"email\": \"{{idempotencyEmail}}\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        }
+      ]
     },
     {
-      "name": "10 - Buscar emprestimos por data",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/emprestimos/data?data=2026-04-11"
-      }
+      "name": "Parte II - Rate Limiting 429",
+      "item": [
+        {
+          "name": "01 - Testar limite de requisicoes",
+          "description": "Execute esta requisicao mais de 10 vezes em sequencia. A API deve retornar HTTP 429 e o header Retry-After quando o IP ficar bloqueado por 30 segundos.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 429) {",
+                  "  pm.test('Rate limit acionado', function () {",
+                  "    pm.expect(pm.response.headers.get('Retry-After')).to.exist;",
+                  "  });",
+                  "} else {",
+                  "  pm.test('Ainda dentro do limite', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 304]);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/jogos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parte II - CORS",
+      "item": [
+        {
+          "name": "01 - Preflight OPTIONS com headers customizados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CORS permite origem web', function () {",
+                  "  pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.exist;",
+                  "});",
+                  "pm.test('CORS permite X-API-Key e Idempotency-Key', function () {",
+                  "  const headers = pm.response.headers.get('Access-Control-Allow-Headers') || '';",
+                  "  pm.expect(headers).to.include('X-API-Key');",
+                  "  pm.expect(headers).to.include('Idempotency-Key');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "https://exemplo-front.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "Content-Type, X-API-Key, Idempotency-Key"
+              }
+            ],
+            "url": "{{baseUrl}}/jogos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parte II - Versionamento",
+      "item": [
+        {
+          "name": "01 - Status v1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/status"
+          }
+        },
+        {
+          "name": "02 - Status v2",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v2/status"
+          }
+        }
+      ]
     }
   ]
 }

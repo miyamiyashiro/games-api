@@ -6,11 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/ApiKeyFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/ApiKeyFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/postman/Games API.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/postman/Games API.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/DetalhesJogoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/DetalhesJogoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EditoraController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EditoraController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EmprestimoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/EmprestimoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/PlataformaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/PlataformaController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/ApiKeyFilterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/ApiKeyFilterTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +59,7 @@
     &quot;Spring Boot.GamesApiApplication.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/luaka/Downloads/games-api&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -102,6 +105,8 @@
       <workItem from="1776199210324" duration="487000" />
       <workItem from="1776203823158" duration="704000" />
       <workItem from="1777767226739" duration="640000" />
+      <workItem from="1779128657518" duration="8000" />
+      <workItem from="1779128676910" duration="4000" />
     </task>
     <servers />
   </component>
