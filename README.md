@@ -2,7 +2,8 @@
 
 > **Status do Projeto:** LIVE  
 > **Documentacao Oficial:** [Swagger UI](https://games-api-3rqr.onrender.com/swagger-ui/index.html)  
-> **Colecao Postman:** [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json)
+> **Colecao Postman:** [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json)  
+> **Frontend:** [`frontend/index.html`](frontend/index.html)
 
 API desenvolvida para gestao de acervos e emprestimos de jogos de tabuleiro e RPG, com foco nos requisitos do projeto final: REST, relacionamentos JPA, HATEOAS, validacao, documentacao OpenAPI, deploy, autenticacao por API Key, idempotencia, rate limiting, CORS e versionamento.
 
@@ -14,8 +15,10 @@ Autora: Luana Miyashiro Salles de Oliveira
 
 * **Swagger UI:** <https://games-api-3rqr.onrender.com/swagger-ui/index.html>
 * **Base da API:** <https://games-api-3rqr.onrender.com>
+* **Frontend publicado:** <https://games-api-3rqr.onrender.com>
 * **Endpoint versionado v1:** <https://games-api-3rqr.onrender.com/api/v1/status>
 * **Endpoint versionado v2:** <https://games-api-3rqr.onrender.com/api/v2/status>
+* **Frontend local:** [`frontend/index.html`](frontend/index.html)
 
 ---
 
@@ -203,6 +206,46 @@ A API demonstra versionamento por URL com duas versoes do endpoint de status:
 3. Execute primeiro a pasta **Parte II - API Key 401** para criar usuario e salvar a `apiKey`.
 4. Execute a pasta **Parte II - Idempotencia 409** para demonstrar conflito por JSON alterado.
 5. Execute varias vezes a requisicao da pasta **Parte II - Rate Limiting 429** para acionar o bloqueio.
+
+---
+
+## Frontend
+
+O projeto tambem possui um frontend simples em HTML, CSS e JavaScript puro, criado para demonstrar a API publicada no Render.
+
+Arquivos principais:
+
+```text
+frontend/index.html
+games-api/src/main/resources/static/index.html
+```
+
+Funcionalidades do frontend:
+
+* lista jogos cadastrados consumindo `GET /jogos`;
+* busca jogos por titulo usando `GET /jogos/busca`;
+* mostra editoras e plataformas para facilitar o cadastro;
+* cria usuario e gera `X-API-Key`;
+* cria jogo usando `X-API-Key`;
+* demonstra erro `401` sem chave de API;
+* demonstra idempotencia com `409`;
+* dispara varias chamadas para demonstrar `429`;
+* compara `GET /api/v1/status` e `GET /api/v2/status`;
+* exibe a ultima resposta da API em formato JSON.
+
+Para usar localmente, abra o arquivo `frontend/index.html` no navegador. A tela ja vem configurada para consumir:
+
+```text
+https://games-api-3rqr.onrender.com
+```
+
+Se estiver rodando a API localmente, altere o campo **Base da API** para `http://localhost:8080`.
+
+Quando o projeto for publicado no Render, a copia em `games-api/src/main/resources/static` faz o Spring Boot servir o frontend diretamente na URL base:
+
+```text
+https://games-api-3rqr.onrender.com
+```
 
 ---
 
