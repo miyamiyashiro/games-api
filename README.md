@@ -4,7 +4,7 @@
 > **Documentacao Oficial:** [Swagger UI](https://games-api-3rqr.onrender.com/swagger-ui/index.html)  
 > **Colecao Postman:** [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json)
 
-API desenvolvida para gestao de acervos e emprestimos de jogos de tabuleiro e RPG, com foco nos requisitos do projeto final: REST, relacionamentos JPA, HATEOAS, validacao, documentacao OpenAPI, deploy, autenticacao por API Key, idempotencia, rate limiting, CORS e versionamento.
+API desenvolvida para gestão de acervos e empréstimos de jogos de tabuleiro e RPG, com foco nos requisitos do projeto final: REST, relacionamentos JPA, HATEOAS, validação, documentação OpenAPI, deploy, autenticação por API Key, idempotência, rate limiting, CORS e versionamento.
 
 Autora: Luana Miyashiro Salles de Oliveira
 
@@ -24,20 +24,20 @@ Autora: Luana Miyashiro Salles de Oliveira
 | Requisito | Como foi atendido |
 | :--- | :--- |
 | Projeto Maven | Projeto Spring Boot com `pom.xml` e Maven Wrapper |
-| API REST | Controllers REST para jogos, usuarios, editoras, plataformas, emprestimos e detalhes |
-| CRUD | Recursos principais possuem operacoes de criacao, consulta, atualizacao e exclusao |
+| API REST | Controllers REST para jogos, usuários, editoras, plataformas, empréstimos e detalhes |
+| CRUD | Recursos principais possuem operações de criação, consulta, atualização e exclusão |
 | HATEOAS | Respostas usam `EntityModel`, `CollectionModel` e `PagedModel` com links |
-| Paginacao | Listagens usam `Pageable` e `PagedResourcesAssembler` |
+| Paginação | Listagens usam `Pageable` e `PagedResourcesAssembler` |
 | One-to-One | `Jogo` possui `DetalhesJogo` |
-| One-to-Many | `Editora` possui varios `Jogo`; `Usuario` possui varios `Emprestimo` |
+| One-to-Many | `Editora` possui vários `Jogo`; `Usuario` possui vários `Emprestimo` |
 | Many-to-One | `Jogo` pertence a uma `Editora`; `Emprestimo` pertence a um `Usuario` e a um `Jogo` |
-| Many-to-Many | `Jogo` possui varias `Plataforma` e `Plataforma` possui varios `Jogo` |
+| Many-to-Many | `Jogo` possui várias `Plataforma` e `Plataforma` possui vários `Jogo` |
 | Enum | `Categoria` classifica os jogos |
-| Validacao | DTOs de entrada usam Bean Validation, como `@NotBlank`, `@Email`, `@Size`, `@NotNull`, `@Min` e `@Max` |
-| Consultas personalizadas | Busca por titulo, e-mail, nome, data e ID do jogo |
+| Validação | DTOs de entrada usam Bean Validation, como `@NotBlank`, `@Email`, `@Size`, `@NotNull`, `@Min` e `@Max` |
+| Consultas personalizadas | Busca por título, e-mail, nome, data e ID do jogo |
 | Tratamento de erros | `GlobalExceptionHandler` padroniza respostas de erro |
-| Swagger/OpenAPI | Documentacao disponivel em `/swagger-ui/index.html` |
-| Postman | Colecao com roteiro de testes da Parte I e Parte II |
+| Swagger/OpenAPI | Documentação disponível em `/swagger-ui/index.html` |
+| Postman | Coleção com roteiro de testes da Parte I e Parte II |
 | Deploy | API publicada no Render com Docker |
 
 ---
@@ -46,26 +46,26 @@ Autora: Luana Miyashiro Salles de Oliveira
 
 | Requisito | Como foi atendido |
 | :--- | :--- |
-| `HTTP 401 Unauthorized` | Escritas protegidas exigem `X-API-Key`; chave ausente ou invalida retorna `401` |
-| API Key | Usuario cria conta, gera chave em `POST /usuarios/{id}/api-key` e usa o header `X-API-Key` |
+| `HTTP 401 Unauthorized` | Escritas protegidas exigem `X-API-Key`; chave ausente ou inválida retorna `401` |
+| API Key | Usuário cria conta, gera chave em `POST /usuarios/{id}/api-key` e usa o header `X-API-Key` |
 | `HTTP 429 Too Many Requests` | Rate limit por IP com bloqueio de 30 segundos ao exceder o limite |
-| Idempotencia | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
-| `HTTP 409 Conflict` | Mesma chave de idempotencia com JSON diferente retorna `409` |
-| CORS | Permite chamadas web, headers customizados e metodos REST |
+| Idempotência | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
+| `HTTP 409 Conflict` | Mesma chave de idempotência com JSON diferente retorna `409` |
+| CORS | Permite chamadas web, headers customizados e métodos REST |
 | Versionamento | Dois contratos versionados: `GET /api/v1/status` e `GET /api/v2/status` |
 
 ---
 
 ## Modelagem de Dados
 
-O sistema foi modelado para demonstrar os principais tipos de relacionamento exigidos na avaliacao:
+O sistema foi modelado para demonstrar os principais tipos de relacionamento exigidos na avaliação:
 
-* **Jogo:** registro central do acervo, com titulo, categoria, editora, plataformas e detalhes complementares.
-* **DetalhesJogo:** informacoes complementares de um jogo, em relacionamento One-to-One com Jogo.
-* **Usuario:** cliente que pode realizar emprestimos e gerar uma chave de API.
+* **Jogo:** registro central do acervo, com título, categoria, editora, plataformas e detalhes complementares.
+* **DetalhesJogo:** informações complementares de um jogo, em relacionamento One-to-One com Jogo.
+* **Usuário:** cliente que pode realizar empréstimos e gerar uma chave de API.
 * **Editora:** publicadora dos jogos, em relacionamento One-to-Many com Jogo.
-* **Emprestimo:** controle de retirada e devolucao, em relacionamento Many-to-One com Usuario e Jogo.
-* **Plataforma:** meio ou sistema onde o jogo esta disponivel, em relacionamento Many-to-Many com Jogo.
+* **Empréstimo:** controle de retirada e devolução, em relacionamento Many-to-One com Usuário e Jogo.
+* **Plataforma:** meio ou sistema onde o jogo esta disponível, em relacionamento Many-to-Many com Jogo.
 * **Categoria:** enum com os tipos de jogos cadastrados.
 
 ---
@@ -91,29 +91,29 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 | Recurso | Endpoint | Observacao |
 | :--- | :--- | :--- |
 | Jogos | `GET /jogos?page=0&size=5` | Lista paginada com HATEOAS |
-| Jogos | `GET /jogos/busca?titulo=catan` | Consulta personalizada por titulo |
+| Jogos | `GET /jogos/busca?titulo=catan` | Consulta personalizada por título |
 | Usuarios | `GET /usuarios/email/luana@email.com` | Consulta personalizada por e-mail |
 | Editoras | `GET /editoras/busca?nome=galapagos` | Consulta personalizada por nome |
 | Plataformas | `GET /plataformas/busca?nome=tabuleiro` | Consulta personalizada por nome |
 | Emprestimos | `GET /emprestimos/data?data=2026-04-11` | Consulta personalizada por data |
 | DetalhesJogo | `GET /detalhes-jogos/jogo/1` | Consulta personalizada pelo ID do jogo |
 | API Key | `POST /usuarios/{id}/api-key` | Gera a chave usada no header `X-API-Key` |
-| Versionamento | `GET /api/v1/status` | Versao simples do endpoint |
-| Versionamento | `GET /api/v2/status` | Versao expandida do endpoint |
+| Versionamento | `GET /api/v1/status` | Versão simples do endpoint |
+| Versionamento | `GET /api/v2/status` | Versão expandida do endpoint |
 
 ---
 
 ## Autenticacao com Chave de API
 
-Operacoes sensiveis de escrita exigem o header `X-API-Key`. As consultas `GET`, o cadastro de usuario e a geracao da chave ficam publicos para permitir o fluxo inicial.
+Operações sensíveis de escrita exigem o header `X-API-Key`. As consultas `GET`, o cadastro de usuário e a geração da chave ficam públicos para permitir o fluxo inicial.
 
 Fluxo:
 
-1. Crie um usuario com `POST /usuarios`.
+1. Crie um usuário com `POST /usuarios`.
 2. Gere a chave com `POST /usuarios/{id}/api-key`.
 3. Envie a chave no header `X-API-Key` ao criar, atualizar ou excluir recursos protegidos.
 
-Se a chave estiver ausente ou invalida, a API retorna `HTTP 401 Unauthorized`.
+Se a chave estiver ausente ou inválida, a API retorna `HTTP 401 Unauthorized`.
 
 Exemplo de header:
 
@@ -123,16 +123,16 @@ X-API-Key: sua-chave-gerada
 
 ---
 
-## Idempotencia
+## Idempotência
 
-Operacoes `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisicao e enviada mais de uma vez.
+Operações `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisição é enviada mais de uma vez.
 
 Comportamento esperado:
 
-* Chave nova: a API processa normalmente a operacao.
+* Chave nova: a API processa normalmente a operação.
 * Mesma chave, mesmo endpoint e mesmo JSON: a API retorna `HTTP 200 OK` e ignora o novo processamento.
 * Mesma chave com JSON alterado: a API retorna `HTTP 409 Conflict`.
-* Mesma chave usada em outro endpoint ou metodo: a API retorna `HTTP 409 Conflict`.
+* Mesma chave usada em outro endpoint ou método: a API retorna `HTTP 409 Conflict`.
 
 Exemplo de header:
 
@@ -144,12 +144,12 @@ Idempotency-Key: demo-idempotencia-001
 
 ## Rate Limiting
 
-A API limita cada IP a 10 requisicoes por minuto. Se o limite for excedido, o cliente recebe `HTTP 429 Too Many Requests` e fica bloqueado por 30 segundos.
+A API limita cada IP a 10 requisições por minuto. Se o limite for excedido, o cliente recebe `HTTP 429 Too Many Requests` e fica bloqueado por 30 segundos.
 
 Headers retornados:
 
 * `X-RateLimit-Limit`: limite total da janela.
-* `X-RateLimit-Remaining`: requisicoes restantes na janela atual.
+* `X-RateLimit-Remaining`: requisições restantes na janela atual.
 * `X-RateLimit-Reset`: momento aproximado de reset da janela, em epoch seconds.
 * `Retry-After`: segundos restantes de bloqueio, enviado nas respostas `429`.
 
@@ -159,12 +159,12 @@ Para testar rapidamente, envie mais de 10 requisicoes seguidas para qualquer end
 
 ## CORS
 
-A API permite requisicoes cross-origin para todos os endpoints, incluindo chamadas feitas por frontends web.
+A API permite requisições cross-origin para todos os endpoints, incluindo chamadas feitas por frontends web.
 
 Configuracao aplicada:
 
 * Origens permitidas: qualquer origem (`*`).
-* Metodos permitidos: `GET`, `POST`, `PUT`, `PATCH`, `DELETE` e `OPTIONS`.
+* Métodos permitidos: `GET`, `POST`, `PUT`, `PATCH`, `DELETE` e `OPTIONS`.
 * Headers permitidos: `Content-Type`, `Accept`, `Authorization`, `X-API-Key` e `Idempotency-Key`.
 * Headers expostos: headers de rate limit, `Retry-After` e `WWW-Authenticate`.
 
@@ -172,37 +172,37 @@ Configuracao aplicada:
 
 ## Versionamento
 
-A API demonstra versionamento por URL com duas versoes do endpoint de status:
+A API demonstra versionamento por URL com duas versões do endpoint de status:
 
-* `GET /api/v1/status`: contrato simples com versao, status e mensagem.
-* `GET /api/v2/status`: contrato expandido com informacoes dos recursos avancados.
+* `GET /api/v1/status`: contrato simples com versão, status e mensagem.
+* `GET /api/v2/status`: contrato expandido com informações dos recursos avançados.
 
 ---
 
-## Roteiro Para Demonstracao
+## Roteiro Para Demonstração
 
 1. Abrir o Swagger em <https://games-api-3rqr.onrender.com/swagger-ui/index.html>.
-2. Mostrar a descricao inicial com os requisitos da Parte I e Parte II.
-3. Executar `GET /jogos?page=0&size=5` e mostrar paginacao e links HATEOAS.
+2. Mostrar a descrição inicial com os requisitos da Parte I e Parte II.
+3. Executar `GET /jogos?page=0&size=5` e mostrar paginação e links HATEOAS.
 4. Executar uma consulta personalizada, como `GET /jogos/busca?titulo=catan`.
-5. Criar um usuario com `POST /usuarios`.
+5. Criar um usuário com `POST /usuarios`.
 6. Gerar a chave com `POST /usuarios/{id}/api-key`.
 7. Tentar criar uma editora sem `X-API-Key` e demonstrar o erro `401`.
-8. Repetir a criacao com `X-API-Key` e demonstrar sucesso.
-9. Enviar duas requisicoes com a mesma `Idempotency-Key`, alterando o JSON na segunda, e demonstrar `409`.
-10. Enviar mais de 10 requisicoes seguidas para demonstrar `429` e o header `Retry-After`.
+8. Repetir a criaçãoo com `X-API-Key` e demonstrar sucesso.
+9. Enviar duas requisições com a mesma `Idempotency-Key`, alterando o JSON na segunda, e demonstrar `409`.
+10. Enviar mais de 10 requisições seguidas para demonstrar `429` e o header `Retry-After`.
 11. Mostrar o preflight `OPTIONS` na colecao Postman para demonstrar CORS.
 12. Comparar `GET /api/v1/status` com `GET /api/v2/status` para demonstrar versionamento.
 
 ---
 
-## Como Usar a Colecao Postman
+## Como Usar a Coleção Postman
 
 1. Importe o arquivo [`games-api/postman/Games API.postman_collection.json`](games-api/postman/Games%20API.postman_collection.json).
-2. Confirme se a variavel `baseUrl` esta como `https://games-api-3rqr.onrender.com`.
-3. Execute primeiro a pasta **Parte II - API Key 401** para criar usuario e salvar a `apiKey`.
+2. Confirme se a variável `baseUrl` está como `https://games-api-3rqr.onrender.com`.
+3. Execute primeiro a pasta **Parte II - API Key 401** para criar usuário e salvar a `apiKey`.
 4. Execute a pasta **Parte II - Idempotencia 409** para demonstrar conflito por JSON alterado.
-5. Execute varias vezes a requisicao da pasta **Parte II - Rate Limiting 429** para acionar o bloqueio.
+5. Execute várias vezes a requisição da pasta **Parte II - Rate Limiting 429** para acionar o bloqueio.
 
 ---
 
