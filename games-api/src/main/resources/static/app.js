@@ -16,9 +16,14 @@ const elements = {
   searchTitle: $("#searchTitle"),
   searchGames: $("#searchGames"),
   loadGames: $("#loadGames"),
+  refreshResources: $("#refreshResources"),
   loadCatalogs: $("#loadCatalogs"),
   publishersList: $("#publishersList"),
   platformsList: $("#platformsList"),
+  publishersCards: $("#publishersCards"),
+  platformsCards: $("#platformsCards"),
+  publisherForm: $("#publisherForm"),
+  platformForm: $("#platformForm"),
   gameForm: $("#gameForm"),
   userForm: $("#userForm"),
   apiKey: $("#apiKey"),
@@ -149,6 +154,28 @@ function renderList(target, items) {
   });
 }
 
+function renderResourceCards(target, items, type) {
+  target.innerHTML = "";
+
+  if (!items.length) {
+    target.innerHTML = '<div class="empty-state">Nenhum registro encontrado.</div>';
+    return;
+  }
+
+  items.slice(0, 10).forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "resource-item";
+    card.innerHTML = `
+      <div>
+        <strong>${itemTitle(item)}</strong>
+        <span>ID ${item.id ?? "-"}</span>
+      </div>
+      <button class="danger-button" type="button" data-type="${type}" data-id="${item.id}">Excluir</button>
+    `;
+    target.appendChild(card);
+  });
+}
+
 async function loadGames() {
   elements.gamesGrid.innerHTML = '<div class="empty-state">Carregando jogos...</div>';
 
@@ -178,16 +205,62 @@ async function searchGames() {
 
 async function loadCatalogs() {
   const [publishers, platforms] = await Promise.all([
-    request("/editoras?page=0&size=8"),
-    request("/plataformas?page=0&size=8")
+    request("/editoras?page=0&size=10"),
+    request("/plataformas?page=0&size=10")
   ]);
 
-  renderList(elements.publishersList, extractItems(publishers.data));
-  renderList(elements.platformsList, extractItems(platforms.data));
+  const publisherItems = extractItems(publishers.data);
+  const platformItems = extractItems(platforms.data);
+
+  renderList(elements.publishersList, publisherItems);
+  renderList(elements.platformsList, platformItems);
+  renderResourceCards(elements.publishersCards, publisherItems, "editora");
+  renderResourceCards(elements.platformsCards, platformItems, "plataforma");
   logResponse("GET /editoras + GET /plataformas", `${publishers.status}/${platforms.status}`, {
     editoras: publishers.data,
     plataformas: platforms.data
   });
+}
+
+async function createSimpleResource(event, type) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const nome = form.nome.value.trim();
+  const path = type === "editora" ? "/editoras" : "/plataformas";
+
+  const result = await request(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": elements.apiKey.value.trim(),
+      "Idempotency-Key": `frontend-${type}-${Date.now()}`
+    },
+    body: JSON.stringify({ nome })
+  });
+
+  logResponse(`POST ${path}`, result.status, result.data, result.headers);
+
+  if (result.ok) {
+    form.reset();
+    await loadCatalogs();
+  }
+}
+
+async function deleteSimpleResource(type, id) {
+  const path = type === "editora" ? `/editoras/${id}` : `/plataformas/${id}`;
+  const result = await request(path, {
+    method: "DELETE",
+    headers: {
+      "X-API-Key": elements.apiKey.value.trim()
+    }
+  });
+
+  logResponse(`DELETE ${path}`, result.status, result.data, result.headers);
+
+  if (result.ok || result.status === 204) {
+    await loadCatalogs();
+  }
 }
 
 async function createUser(event) {
@@ -327,13 +400,13 @@ async function test429() {
 
 async function loadVersions() {
   const [v1, v2] = await Promise.all([
-    request("/api/v1/status"),
-    request("/api/v2/status")
+    request("/api/v1/jogos?page=0&size=1"),
+    request("/api/v2/jogos?page=0&size=1")
   ]);
 
   elements.versionOne.textContent = JSON.stringify(v1.data, null, 2);
   elements.versionTwo.textContent = JSON.stringify(v2.data, null, 2);
-  logResponse("GET /api/v1/status + GET /api/v2/status", `${v1.status}/${v2.status}`, {
+  logResponse("GET /api/v1/jogos + GET /api/v2/jogos", `${v1.status}/${v2.status}`, {
     v1: v1.data,
     v2: v2.data
   });
@@ -348,6 +421,7 @@ elements.saveBaseUrl.addEventListener("click", () => {
 
 elements.loadGames.addEventListener("click", loadGames);
 elements.searchGames.addEventListener("click", searchGames);
+elements.refreshResources.addEventListener("click", loadCatalogs);
 elements.searchTitle.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -355,6 +429,20 @@ elements.searchTitle.addEventListener("keydown", (event) => {
   }
 });
 elements.loadCatalogs.addEventListener("click", loadCatalogs);
+elements.publisherForm.addEventListener("submit", (event) => createSimpleResource(event, "editora"));
+elements.platformForm.addEventListener("submit", (event) => createSimpleResource(event, "plataforma"));
+elements.publishersCards.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-type][data-id]");
+  if (button) {
+    deleteSimpleResource(button.dataset.type, button.dataset.id);
+  }
+});
+elements.platformsCards.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-type][data-id]");
+  if (button) {
+    deleteSimpleResource(button.dataset.type, button.dataset.id);
+  }
+});
 elements.userForm.addEventListener("submit", createUser);
 elements.gameForm.addEventListener("submit", createGame);
 elements.test401.addEventListener("click", test401);

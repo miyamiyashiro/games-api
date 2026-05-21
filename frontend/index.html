@@ -24,6 +24,7 @@
 
       <nav class="nav-list" aria-label="Navegacao principal">
         <a href="#acervo">Acervo</a>
+        <a href="#recursos">Recursos</a>
         <a href="#cadastros">Cadastros</a>
         <a href="#seguranca">API Key</a>
         <a href="#testes">Testes HTTP</a>
@@ -74,6 +75,46 @@
           </div>
         </div>
         <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="recursos" class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">CRUD visual</p>
+            <h3>Editoras e plataformas</h3>
+          </div>
+          <button id="refreshResources" type="button">Atualizar recursos</button>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-column">
+            <div class="resource-header">
+              <div>
+                <h4>Editoras</h4>
+                <p>Crie editoras e use o ID ao cadastrar jogos.</p>
+              </div>
+            </div>
+            <form id="publisherForm" class="inline-form">
+              <input name="nome" required placeholder="Nome da editora">
+              <button type="submit">Criar</button>
+            </form>
+            <div id="publishersCards" class="resource-list" aria-live="polite"></div>
+          </article>
+
+          <article class="resource-column">
+            <div class="resource-header">
+              <div>
+                <h4>Plataformas</h4>
+                <p>Crie plataformas e use o ID ao cadastrar jogos.</p>
+              </div>
+            </div>
+            <form id="platformForm" class="inline-form">
+              <input name="nome" required placeholder="Nome da plataforma">
+              <button type="submit">Criar</button>
+            </form>
+            <div id="platformsCards" class="resource-list" aria-live="polite"></div>
+          </article>
+        </div>
       </section>
 
       <section id="cadastros" class="split-grid">
@@ -186,17 +227,17 @@
 
       <section id="versionamento" class="panel">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Versionamento</p>
-            <h3>Comparar contratos v1 e v2</h3>
-          </div>
-          <button id="loadVersions" type="button">Comparar</button>
+        <div>
+          <p class="eyebrow">Versionamento</p>
+          <h3>Comparar contratos de jogos v1 e v2</h3>
         </div>
-        <div class="version-grid">
-          <pre id="versionOne">GET /api/v1/status</pre>
-          <pre id="versionTwo">GET /api/v2/status</pre>
-        </div>
-      </section>
+        <button id="loadVersions" type="button">Comparar</button>
+      </div>
+      <div class="version-grid">
+          <pre id="versionOne">GET /api/v1/jogos</pre>
+          <pre id="versionTwo">GET /api/v2/jogos</pre>
+      </div>
+    </section>
     </main>
   </div>
 

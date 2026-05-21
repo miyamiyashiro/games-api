@@ -16,8 +16,10 @@ Autora: Luana Miyashiro Salles de Oliveira
 * **Swagger UI:** <https://games-api-3rqr.onrender.com/swagger-ui/index.html>
 * **Base da API:** <https://games-api-3rqr.onrender.com>
 * **Frontend publicado:** <https://games-api-3rqr.onrender.com>
-* **Endpoint versionado v1:** <https://games-api-3rqr.onrender.com/api/v1/status>
-* **Endpoint versionado v2:** <https://games-api-3rqr.onrender.com/api/v2/status>
+* **Jogos v1:** <https://games-api-3rqr.onrender.com/api/v1/jogos>
+* **Jogos v2:** <https://games-api-3rqr.onrender.com/api/v2/jogos>
+* **Status v1:** <https://games-api-3rqr.onrender.com/api/v1/status>
+* **Status v2:** <https://games-api-3rqr.onrender.com/api/v2/status>
 * **Frontend local:** [`frontend/index.html`](frontend/index.html)
 
 ---
@@ -55,7 +57,7 @@ Autora: Luana Miyashiro Salles de Oliveira
 | Idempotência | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
 | `HTTP 409 Conflict` | Mesma chave de idempotência com JSON diferente retorna `409` |
 | CORS | Permite chamadas web, headers customizados e métodos REST |
-| Versionamento | Dois contratos versionados: `GET /api/v1/status` e `GET /api/v2/status` |
+| Versionamento | Dois contratos versionados do recurso Jogos: `GET /api/v1/jogos` e `GET /api/v2/jogos` |
 
 ---
 
@@ -101,8 +103,10 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 | Emprestimos | `GET /emprestimos/data?data=2026-04-11` | Consulta personalizada por data |
 | DetalhesJogo | `GET /detalhes-jogos/jogo/1` | Consulta personalizada pelo ID do jogo |
 | API Key | `POST /usuarios/{id}/api-key` | Gera a chave usada no header `X-API-Key` |
-| Versionamento | `GET /api/v1/status` | Versão simples do endpoint |
-| Versionamento | `GET /api/v2/status` | Versão expandida do endpoint |
+| Versionamento | `GET /api/v1/jogos` | Versão simplificada do recurso Jogos |
+| Versionamento | `GET /api/v2/jogos` | Versão completa do recurso Jogos com HATEOAS |
+| Versionamento | `GET /api/v1/status` | Status simples da API |
+| Versionamento | `GET /api/v2/status` | Status expandido da API |
 
 ---
 
@@ -175,10 +179,15 @@ Configuracao aplicada:
 
 ## Versionamento
 
-A API demonstra versionamento por URL com duas versões do endpoint de status:
+A API demonstra versionamento por URL com duas versões do recurso Jogos:
 
-* `GET /api/v1/status`: contrato simples com versão, status e mensagem.
-* `GET /api/v2/status`: contrato expandido com informações dos recursos avançados.
+* `GET /api/v1/jogos`: contrato simplificado com `id`, `titulo` e `categoria`.
+* `GET /api/v2/jogos`: contrato completo com editora, plataformas, detalhes e links HATEOAS.
+
+Também existem endpoints auxiliares de status:
+
+* `GET /api/v1/status`: status simples da API.
+* `GET /api/v2/status`: status expandido com informações dos recursos avançados.
 
 ---
 
@@ -195,7 +204,7 @@ A API demonstra versionamento por URL com duas versões do endpoint de status:
 9. Enviar duas requisições com a mesma `Idempotency-Key`, alterando o JSON na segunda, e demonstrar `409`.
 10. Enviar mais de 10 requisições seguidas para demonstrar `429` e o header `Retry-After`.
 11. Mostrar o preflight `OPTIONS` na colecao Postman para demonstrar CORS.
-12. Comparar `GET /api/v1/status` com `GET /api/v2/status` para demonstrar versionamento.
+12. Comparar `GET /api/v1/jogos` com `GET /api/v2/jogos` para demonstrar versionamento real de um recurso.
 
 ---
 
@@ -224,13 +233,15 @@ Funcionalidades do frontend:
 
 * lista jogos cadastrados consumindo `GET /jogos`;
 * busca jogos por titulo usando `GET /jogos/busca`;
-* mostra editoras e plataformas para facilitar o cadastro;
+* lista, cria e exclui editoras;
+* lista, cria e exclui plataformas;
+* mostra IDs de editoras e plataformas para facilitar o cadastro de jogos;
 * cria usuario e gera `X-API-Key`;
 * cria jogo usando `X-API-Key`;
 * demonstra erro `401` sem chave de API;
 * demonstra idempotencia com `409`;
 * dispara varias chamadas para demonstrar `429`;
-* compara `GET /api/v1/status` e `GET /api/v2/status`;
+* compara `GET /api/v1/jogos` e `GET /api/v2/jogos`;
 * exibe a ultima resposta da API em formato JSON.
 
 Para usar localmente, abra o arquivo `frontend/index.html` no navegador. A tela ja vem configurada para consumir:

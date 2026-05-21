@@ -55,7 +55,10 @@ import java.util.Set;
                         "A API aceita requisicoes cross-origin e libera os headers `X-API-Key` e `Idempotency-Key`. " +
                         "Tambem expoe os headers de rate limit e autenticacao para clientes web.\n\n" +
                         "## Parte II - Versionamento\n" +
-                        "A API demonstra versionamento por URL nos endpoints `GET /api/v1/status` e `GET /api/v2/status`.",
+                        "A API demonstra versionamento por URL em dois contratos do recurso Jogos: " +
+                        "`GET /api/v1/jogos` retorna uma versao simplificada e " +
+                        "`GET /api/v2/jogos` retorna uma versao completa com HATEOAS. " +
+                        "Tambem existem os endpoints auxiliares `GET /api/v1/status` e `GET /api/v2/status`.",
                 contact = @Contact(name = "Luana Miyashiro")
         ),
         tags = {
@@ -65,7 +68,8 @@ import java.util.Set;
                 @Tag(name = "Plataformas", description = "Plataformas ou formatos dos jogos. Demonstra Many-to-Many com Jogos."),
                 @Tag(name = "Emprestimos", description = "Controle de emprestimos, relacionando Usuario e Jogo com validacao de datas."),
                 @Tag(name = "Detalhes dos Jogos", description = "Informacoes complementares em relacionamento One-to-One com Jogo."),
-                @Tag(name = "Versionamento", description = "Endpoints v1 e v2 para demonstrar versionamento por URL.")
+                @Tag(name = "Versionamento", description = "Endpoints auxiliares de status em v1 e v2."),
+                @Tag(name = "Jogos Versionados", description = "Contratos v1 e v2 do recurso Jogos, demonstrando evolucao de resposta por URL.")
         }
 )
 public class OpenApiConfig {
