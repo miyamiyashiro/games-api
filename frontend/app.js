@@ -549,5 +549,3 @@ elements.apiKey.addEventListener("input", () => {
 });
 
 loadGames();
-loadCatalogs();
-loadVersions();

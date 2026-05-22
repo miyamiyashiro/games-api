@@ -47,7 +47,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()) || deveIgnorar(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -89,6 +89,20 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean deveIgnorar(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return path.equals("/")
+                || path.equals("/index.html")
+                || path.equals("/styles.css")
+                || path.equals("/app.js")
+                || path.equals("/favicon.ico")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/webjars")
+                || path.startsWith("/h2-console");
     }
 
     private void setRateLimitHeaders(HttpServletResponse response, int remaining, long resetAtMillis) {

@@ -40,4 +40,17 @@ class RateLimitFilterTests {
                 .andExpect(header().string("X-RateLimit-Remaining", "0"))
                 .andExpect(header().string("Retry-After", containsString("30")));
     }
+
+    @Test
+    void naoDeveAplicarRateLimitEmAssetsDoFrontend() throws Exception {
+        String ip = "203.0.113.11";
+
+        for (int i = 0; i < 12; i++) {
+            mockMvc.perform(get("/styles.css").with(request -> {
+                        request.setRemoteAddr(ip);
+                        return request;
+                    }))
+                    .andExpect(status().isOk());
+        }
+    }
 }
