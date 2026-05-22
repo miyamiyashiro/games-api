@@ -53,4 +53,31 @@ class RateLimitFilterTests {
                     .andExpect(status().isOk());
         }
     }
+
+    @Test
+    void deveContarRequisicoesInvalidasNoRateLimit() throws Exception {
+        String ip = "203.0.113.12";
+
+        for (int i = 0; i < 10; i++) {
+            mockMvc.perform(get("/plataformas")
+                            .param("page", "500")
+                            .param("size", "400")
+                            .with(request -> {
+                                request.setRemoteAddr(ip);
+                                return request;
+                            }))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(header().string("X-RateLimit-Limit", "10"));
+        }
+
+        mockMvc.perform(get("/plataformas")
+                        .param("page", "500")
+                        .param("size", "400")
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        }))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", containsString("30")));
+    }
 }

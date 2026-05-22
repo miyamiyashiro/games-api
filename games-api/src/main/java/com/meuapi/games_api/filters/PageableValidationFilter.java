@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@Order(0)
+@Order(1)
 public class PageableValidationFilter extends OncePerRequestFilter {
 
     private static final int MAX_PAGE = 10_000;
