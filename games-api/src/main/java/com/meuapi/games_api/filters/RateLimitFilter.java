@@ -1,6 +1,7 @@
 package com.meuapi.games_api.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meuapi.games_api.exceptions.ApiErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,11 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Rate limiting por IP.
- * Cada IP pode fazer ate MAX_REQUESTS requisicoes por janela de tempo.
- * Ao exceder o limite, o IP fica bloqueado por 30 segundos e recebe HTTP 429.
- */
 @Component
 @Order(1)
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -45,9 +41,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
@@ -62,7 +60,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             if (data.blockedUntil > 0 && now < data.blockedUntil) {
                 long secondsRemaining = secondsUntil(data.blockedUntil, now);
                 setRateLimitHeaders(response, 0, data.blockedUntil);
-                escreverResposta429(response, ip, secondsRemaining);
+                escreverResposta429(request, response, ip, secondsRemaining);
                 return;
             }
 
@@ -82,7 +80,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             if (requests > MAX_REQUESTS) {
                 data.blockedUntil = now + BLOCK_MS;
                 setRateLimitHeaders(response, 0, data.blockedUntil);
-                escreverResposta429(response, ip, secondsUntil(data.blockedUntil, now));
+                escreverResposta429(request, response, ip, secondsUntil(data.blockedUntil, now));
                 return;
             }
 
@@ -99,18 +97,24 @@ public class RateLimitFilter extends OncePerRequestFilter {
         response.setHeader(HEADER_RESET, String.valueOf(resetAtMillis / 1000));
     }
 
-    private void escreverResposta429(HttpServletResponse response, String ip, long segundosRestantes)
-            throws IOException {
+    private void escreverResposta429(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String ip,
+            long segundosRestantes
+    ) throws IOException {
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setHeader(HEADER_RETRY_AFTER, String.valueOf(segundosRestantes));
 
-        Map<String, Object> corpo = Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", 429,
-                "erro", "Too Many Requests",
-                "mensagem", "Você excedeu o limite de requisições. Tente novamente em " + segundosRestantes + " segundos.",
-                "detalhes", List.of("IP bloqueado: " + ip, "Retry-After: " + segundosRestantes + "s")
+        ApiErrorResponse corpo = new ApiErrorResponse(
+                LocalDateTime.now().toString(),
+                429,
+                "Too Many Requests",
+                "Voce excedeu o limite de requisicoes. Tente novamente em " + segundosRestantes + " segundos.",
+                request.getRequestURI(),
+                request.getMethod(),
+                List.of("IP bloqueado: " + ip, "Retry-After: " + segundosRestantes + "s")
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);

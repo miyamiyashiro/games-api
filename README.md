@@ -130,6 +130,26 @@ X-API-Key: sua-chave-gerada
 
 ---
 
+## Tratamento de Erros
+
+As respostas de erro seguem um formato padronizado para facilitar testes no Swagger, Postman e frontend:
+
+```json
+{
+  "timestamp": "2026-05-21T18:39:00",
+  "status": 404,
+  "erro": "Not Found",
+  "mensagem": "Endpoint nao encontrado",
+  "caminho": "/rota-invalida",
+  "metodo": "GET",
+  "detalhes": ["Confira o caminho da URL e consulte /swagger-ui/index.html."]
+}
+```
+
+Casos tratados: validacao `400`, JSON invalido `400`, recurso inexistente `404`, metodo HTTP incorreto `405`, content type incorreto `415`, API Key ausente/invalida `401`, conflito de idempotencia `409` e excesso de requisicoes `429`.
+
+---
+
 ## Idempotência
 
 Operações `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisição é enviada mais de uma vez.
@@ -233,6 +253,7 @@ Funcionalidades do frontend:
 
 * lista jogos cadastrados consumindo `GET /jogos`;
 * busca jogos por titulo usando `GET /jogos/busca`;
+* edita e exclui jogos diretamente pelos cards, usando `PUT /jogos/{id}` e `DELETE /jogos/{id}`;
 * lista, cria e exclui editoras;
 * lista, cria e exclui plataformas;
 * mostra IDs de editoras e plataformas para facilitar o cadastro de jogos;

@@ -281,6 +281,13 @@ h4 {
   font-size: 1.06rem;
 }
 
+.game-actions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 4px;
+}
+
 .meta-list {
   color: var(--muted);
   display: grid;
@@ -380,6 +387,20 @@ h4 {
 
 .danger-button:hover {
   background: #7f1231;
+}
+
+.secondary-button {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.secondary-button:hover {
+  background: var(--soft);
+}
+
+#cancelGameEdit {
+  display: none;
 }
 
 .key-row {

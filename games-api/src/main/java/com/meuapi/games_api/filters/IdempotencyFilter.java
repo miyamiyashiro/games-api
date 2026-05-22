@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.meuapi.games_api.exceptions.ApiErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
@@ -30,10 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Filtro de idempotencia para operacoes de escrita.
- * A mesma Idempotency-Key so pode ser reutilizada para a mesma operacao e o mesmo JSON.
- */
 @Component
 @Order(3)
 public class IdempotencyFilter extends OncePerRequestFilter {
@@ -48,9 +45,11 @@ public class IdempotencyFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String metodo = request.getMethod().toUpperCase();
 
@@ -67,10 +66,15 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         }
 
         CachedBodyRequestWrapper requestWrapper = new CachedBodyRequestWrapper(request);
+        String corpoNormalizado = normalizarBodyOuResponderErro(requestWrapper.getBodyBytes(), request, response);
+        if (corpoNormalizado == null) {
+            return;
+        }
+
         IdempotencyEntry entradaAtual = new IdempotencyEntry(
                 metodo,
                 request.getRequestURI(),
-                normalizarBody(requestWrapper.getBodyBytes())
+                corpoNormalizado
         );
         IdempotencyEntry entradaAnterior = cache.get(idempotencyKey);
 
@@ -83,32 +87,41 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         if (!entradaAnterior.method().equals(entradaAtual.method())
                 || !entradaAnterior.path().equals(entradaAtual.path())) {
             escreverRespostaErro(response, HttpStatus.CONFLICT,
-                    "Conflito de idempotência: esta chave já foi usada em outra operação.",
-                    idempotencyKey);
+                    "Conflito de idempotencia: esta chave ja foi usada em outra operacao.",
+                    request,
+                    List.of("Idempotency-Key: " + idempotencyKey));
             return;
         }
 
         if (!entradaAnterior.normalizedBody().equals(entradaAtual.normalizedBody())) {
             escreverRespostaErro(response, HttpStatus.CONFLICT,
-                    "Conflito de idempotência: o corpo da requisição é diferente do original para esta chave.",
-                    idempotencyKey);
+                    "Conflito de idempotencia: o corpo da requisicao e diferente do original para esta chave.",
+                    request,
+                    List.of("Idempotency-Key: " + idempotencyKey));
             return;
         }
 
         escreverRespostaSucessoIdempotente(response, idempotencyKey);
     }
 
-    private void escreverRespostaErro(HttpServletResponse response, HttpStatus status, String mensagem, String chave)
-            throws IOException {
+    private void escreverRespostaErro(
+            HttpServletResponse response,
+            HttpStatus status,
+            String mensagem,
+            HttpServletRequest request,
+            List<String> detalhes
+    ) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        Map<String, Object> corpo = Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", status.value(),
-                "erro", status.getReasonPhrase(),
-                "mensagem", mensagem,
-                "detalhes", List.of("Idempotency-Key: " + chave)
+        ApiErrorResponse corpo = new ApiErrorResponse(
+                LocalDateTime.now().toString(),
+                status.value(),
+                status.getReasonPhrase(),
+                mensagem,
+                request.getRequestURI(),
+                request.getMethod(),
+                detalhes
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);
@@ -121,11 +134,25 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         Map<String, Object> corpo = Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 200,
-                "mensagem", "Operação já realizada anteriormente. O processamento foi ignorado para evitar duplicidade.",
+                "mensagem", "Operacao ja realizada anteriormente. O processamento foi ignorado para evitar duplicidade.",
                 "idempotencyKey", chave
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);
+    }
+
+    private String normalizarBodyOuResponderErro(
+            byte[] body,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        try {
+            return normalizarBody(body);
+        } catch (IOException ex) {
+            escreverRespostaErro(response, HttpStatus.BAD_REQUEST, "JSON invalido ou mal formatado", request,
+                    List.of("A Idempotency-Key so pode ser processada quando o corpo JSON e valido."));
+            return null;
+        }
     }
 
     private String normalizarBody(byte[] body) throws IOException {

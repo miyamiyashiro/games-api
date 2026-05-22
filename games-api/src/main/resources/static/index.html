@@ -122,7 +122,7 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">Cadastro</p>
-              <h3>Novo jogo</h3>
+              <h3 id="gameFormTitle">Novo jogo</h3>
             </div>
           </div>
           <form id="gameForm" class="form-grid">
@@ -148,7 +148,8 @@
               Plataforma ID
               <input name="plataformaId" type="number" min="1" value="1" required>
             </label>
-            <button type="submit">Criar jogo com API Key</button>
+            <button id="saveGameButton" type="submit">Criar jogo com API Key</button>
+            <button id="cancelGameEdit" class="secondary-button" type="button">Cancelar edicao</button>
           </form>
         </article>
 

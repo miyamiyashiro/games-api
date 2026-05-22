@@ -3,7 +3,8 @@ const state = {
   apiKey: localStorage.getItem("gamesApiKey") || "",
   usuarioId: localStorage.getItem("gamesApiUsuarioId") || "",
   idempotencyKey: `frontend-demo-idempotencia-${Date.now()}`,
-  idempotencyEmail: `frontend-idempotencia-${Date.now()}@email.com`
+  idempotencyEmail: `frontend-idempotencia-${Date.now()}@email.com`,
+  editingGameId: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -25,6 +26,9 @@ const elements = {
   publisherForm: $("#publisherForm"),
   platformForm: $("#platformForm"),
   gameForm: $("#gameForm"),
+  gameFormTitle: $("#gameFormTitle"),
+  saveGameButton: $("#saveGameButton"),
+  cancelGameEdit: $("#cancelGameEdit"),
   userForm: $("#userForm"),
   apiKey: $("#apiKey"),
   copyKey: $("#copyKey"),
@@ -133,6 +137,10 @@ function renderGames(items) {
         <span>ID: ${game.id ?? "-"}</span>
         <span>Editora: ${editora}</span>
         <span>Plataformas: ${plataformas || "-"}</span>
+      </div>
+      <div class="game-actions">
+        <button type="button" data-action="edit-game" data-id="${game.id}">Editar</button>
+        <button class="danger-button" type="button" data-action="delete-game" data-id="${game.id}">Excluir</button>
       </div>
     `;
     elements.gamesGrid.appendChild(card);
@@ -263,6 +271,60 @@ async function deleteSimpleResource(type, id) {
   }
 }
 
+function resetGameForm() {
+  state.editingGameId = null;
+  elements.gameForm.reset();
+  elements.gameForm.categoria.value = "TABULEIRO";
+  elements.gameForm.editoraId.value = "1";
+  elements.gameForm.plataformaId.value = "1";
+  elements.gameFormTitle.textContent = "Novo jogo";
+  elements.saveGameButton.textContent = "Criar jogo com API Key";
+  elements.cancelGameEdit.style.display = "none";
+}
+
+async function startEditGame(id) {
+  const result = await request(`/jogos/${id}`);
+  logResponse(`GET /jogos/${id}`, result.status, result.data, result.headers);
+
+  if (!result.ok || !result.data) {
+    return;
+  }
+
+  const game = result.data;
+  state.editingGameId = id;
+  elements.gameForm.titulo.value = game.titulo || "";
+  elements.gameForm.categoria.value = game.categoria || "TABULEIRO";
+  elements.gameForm.editoraId.value = String(game.editora?.id || 1);
+  elements.gameForm.plataformaId.value = String(game.plataformas?.[0]?.id || 1);
+  elements.gameFormTitle.textContent = "Editar jogo";
+  elements.saveGameButton.textContent = "Salvar alteracoes";
+  elements.cancelGameEdit.style.display = "inline-flex";
+  document.querySelector("#cadastros").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function deleteGame(id) {
+  const confirmed = window.confirm("Excluir este jogo?");
+  if (!confirmed) {
+    return;
+  }
+
+  const result = await request(`/jogos/${id}`, {
+    method: "DELETE",
+    headers: {
+      "X-API-Key": elements.apiKey.value.trim()
+    }
+  });
+
+  logResponse(`DELETE /jogos/${id}`, result.status, result.data, result.headers);
+
+  if (result.ok || result.status === 204) {
+    if (state.editingGameId === id) {
+      resetGameForm();
+    }
+    await loadGames();
+  }
+}
+
 async function createUser(event) {
   event.preventDefault();
 
@@ -316,19 +378,24 @@ async function createGame(event) {
     plataformaIds: [Number(form.get("plataformaId"))]
   };
 
-  const result = await request("/jogos", {
-    method: "POST",
+  const isEditing = Boolean(state.editingGameId);
+  const path = isEditing ? `/jogos/${state.editingGameId}` : "/jogos";
+  const method = isEditing ? "PUT" : "POST";
+
+  const result = await request(path, {
+    method,
     headers: {
       "Content-Type": "application/json",
       "X-API-Key": elements.apiKey.value.trim(),
-      "Idempotency-Key": `frontend-jogo-${Date.now()}`
+      "Idempotency-Key": `frontend-jogo-${isEditing ? "edit" : "novo"}-${Date.now()}`
     },
     body: JSON.stringify(body)
   });
 
-  logResponse("POST /jogos", result.status, result.data, result.headers);
+  logResponse(`${method} ${path}`, result.status, result.data, result.headers);
 
   if (result.ok) {
+    resetGameForm();
     await loadGames();
   }
 }
@@ -429,6 +496,21 @@ elements.searchTitle.addEventListener("keydown", (event) => {
   }
 });
 elements.loadCatalogs.addEventListener("click", loadCatalogs);
+elements.gamesGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action][data-id]");
+  if (!button) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-game") {
+    startEditGame(button.dataset.id);
+    return;
+  }
+
+  if (button.dataset.action === "delete-game") {
+    deleteGame(button.dataset.id);
+  }
+});
 elements.publisherForm.addEventListener("submit", (event) => createSimpleResource(event, "editora"));
 elements.platformForm.addEventListener("submit", (event) => createSimpleResource(event, "plataforma"));
 elements.publishersCards.addEventListener("click", (event) => {
@@ -445,6 +527,7 @@ elements.platformsCards.addEventListener("click", (event) => {
 });
 elements.userForm.addEventListener("submit", createUser);
 elements.gameForm.addEventListener("submit", createGame);
+elements.cancelGameEdit.addEventListener("click", resetGameForm);
 elements.test401.addEventListener("click", test401);
 elements.test409First.addEventListener("click", test409First);
 elements.test409Second.addEventListener("click", test409Second);

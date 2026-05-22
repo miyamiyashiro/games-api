@@ -1,5 +1,7 @@
 package com.meuapi.games_api.infrastructure;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -8,11 +10,19 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -58,7 +68,10 @@ import java.util.Set;
                         "A API demonstra versionamento por URL em dois contratos do recurso Jogos: " +
                         "`GET /api/v1/jogos` retorna uma versao simplificada e " +
                         "`GET /api/v2/jogos` retorna uma versao completa com HATEOAS. " +
-                        "Tambem existem os endpoints auxiliares `GET /api/v1/status` e `GET /api/v2/status`.",
+                        "Tambem existem os endpoints auxiliares `GET /api/v1/status` e `GET /api/v2/status`.\n\n" +
+                        "## Tratamento de erros\n" +
+                        "Erros seguem o contrato `ApiErrorResponse`, com `timestamp`, `status`, `erro`, " +
+                        "`mensagem`, `caminho`, `metodo` e `detalhes`.",
                 contact = @Contact(name = "Luana Miyashiro")
         ),
         tags = {
@@ -83,17 +96,65 @@ public class OpenApiConfig {
 
     @Bean
     OpenApiCustomizer apiKeySecurityOnlyForProtectedWrites() {
-        return openApi -> openApi.getPaths().forEach((path, pathItem) ->
-                pathItem.readOperationsMap().forEach((method, operation) -> {
-                    if (PROTECTED_METHODS.contains(method) && !isPublicBootstrapRoute(method, path)) {
-                        operation.addSecurityItem(new SecurityRequirement().addList("ApiKeyAuth"));
-                    }
-                })
-        );
+        return openApi -> {
+            if (openApi.getComponents() == null) {
+                openApi.setComponents(new Components());
+            }
+            openApi.getComponents().addSchemas("ApiErrorResponse", apiErrorResponseSchema());
+
+            openApi.getPaths().forEach((path, pathItem) ->
+                    pathItem.readOperationsMap().forEach((method, operation) -> {
+                        boolean protectedWrite = PROTECTED_METHODS.contains(method) && !isPublicBootstrapRoute(method, path);
+
+                        addResponseIfAbsent(operation, "400", "Requisicao invalida, JSON mal formatado ou dados fora do contrato.");
+                        addResponseIfAbsent(operation, "429", "Muitas requisicoes. O cliente deve aguardar o tempo indicado em Retry-After.");
+
+                        if (protectedWrite) {
+                            operation.addSecurityItem(new SecurityRequirement().addList("ApiKeyAuth"));
+                            addResponseIfAbsent(operation, "401", "Chave de API ausente ou invalida.");
+                        } else {
+                            operation.getResponses().remove("401");
+                        }
+
+                        if (method == PathItem.HttpMethod.POST
+                                || method == PathItem.HttpMethod.PUT
+                                || method == PathItem.HttpMethod.PATCH) {
+                            addResponseIfAbsent(operation, "409", "Conflito de idempotencia ou regra de unicidade.");
+                        }
+                    })
+            );
+        };
     }
 
     private boolean isPublicBootstrapRoute(PathItem.HttpMethod method, String path) {
         return method == PathItem.HttpMethod.POST
                 && ("/usuarios".equals(path) || "/usuarios/{id}/api-key".equals(path));
+    }
+
+    private void addResponseIfAbsent(Operation operation, String code, String description) {
+        if (!operation.getResponses().containsKey(code)) {
+            operation.getResponses().addApiResponse(code, new ApiResponse()
+                    .description(description)
+                    .content(errorContent()));
+        }
+    }
+
+    private Content errorContent() {
+        return new Content().addMediaType("application/json",
+                new io.swagger.v3.oas.models.media.MediaType()
+                        .schema(new Schema<>().$ref("#/components/schemas/ApiErrorResponse")));
+    }
+
+    private Schema<?> apiErrorResponseSchema() {
+        return new ObjectSchema()
+                .description("Resposta padronizada para erros da API")
+                .addProperty("timestamp", new StringSchema().example("2026-05-21T18:39:00"))
+                .addProperty("status", new IntegerSchema().example(404))
+                .addProperty("erro", new StringSchema().example("Not Found"))
+                .addProperty("mensagem", new StringSchema().example("Endpoint nao encontrado"))
+                .addProperty("caminho", new StringSchema().example("/jogos/999"))
+                .addProperty("metodo", new StringSchema().example("GET"))
+                .addProperty("detalhes", new ArraySchema().items(new StringSchema())
+                        .example(List.of("Confira o caminho da URL e consulte /swagger-ui/index.html.")));
     }
 }
