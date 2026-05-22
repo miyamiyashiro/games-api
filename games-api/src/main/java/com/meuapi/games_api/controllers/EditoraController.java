@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +60,7 @@ public class EditoraController {
     })
     @Operation(summary = "Lista todas as editoras", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
-    public PagedModel<EntityModel<Editora>> listarTodas(Pageable pageable) {
+    public PagedModel<EntityModel<Editora>> listarTodas(@ParameterObject Pageable pageable) {
         Page<Editora> editoras = repository.findAll(pageable);
         return assembler.toModel(editoras, this::criarModelo);
     }

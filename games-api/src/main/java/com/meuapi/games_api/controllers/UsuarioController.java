@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +56,7 @@ public class UsuarioController {
     })
     @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(Pageable pageable) {
+    public ResponseEntity<PagedModel<EntityModel<Usuario>>> listarTodos(@ParameterObject Pageable pageable) {
         Page<Usuario> usuarios = repository.findAll(pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(usuarios, this::criarModelo));
     }

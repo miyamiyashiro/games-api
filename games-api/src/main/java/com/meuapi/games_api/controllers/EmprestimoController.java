@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,7 +74,7 @@ public class EmprestimoController {
     })
     @Operation(summary = "Lista todos os empréstimos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
-    public PagedModel<EntityModel<Emprestimo>> listarTodos(Pageable pageable) {
+    public PagedModel<EntityModel<Emprestimo>> listarTodos(@ParameterObject Pageable pageable) {
         Page<Emprestimo> emprestimos = repository.findAll(pageable);
         return assembler.toModel(emprestimos, this::criarModelo);
     }

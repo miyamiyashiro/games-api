@@ -86,4 +86,34 @@ class GlobalExceptionHandlerTests {
                 .andExpect(jsonPath("$.caminho").value("/usuarios/1/api-key"))
                 .andExpect(jsonPath("$.metodo").value("GET"));
     }
+
+    @Test
+    void deveRetornarBadRequestParaPaginacaoAbsurda() throws Exception {
+        mockMvc.perform(get("/plataformas")
+                        .param("page", "1073741824")
+                        .param("size", "1073741824")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.84");
+                            return request;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Parametros de paginacao invalidos"))
+                .andExpect(jsonPath("$.caminho").value("/plataformas"))
+                .andExpect(jsonPath("$.metodo").value("GET"));
+    }
+
+    @Test
+    void deveRetornarBadRequestParaPageableComoJson() throws Exception {
+        mockMvc.perform(get("/plataformas")
+                        .param("pageable", "{\"page\":1073741824,\"size\":1073741824,\"sort\":[\"string\"]}")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.85");
+                            return request;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Parametros de paginacao invalidos"))
+                .andExpect(jsonPath("$.detalhes[0]").value(containsString("page, size e sort")));
+    }
 }

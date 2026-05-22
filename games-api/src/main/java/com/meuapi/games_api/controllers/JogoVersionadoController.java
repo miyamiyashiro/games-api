@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class JogoVersionadoController {
             @ApiResponse(responseCode = "429", description = "Muitas requisicoes", content = @Content)
     })
     @GetMapping("/api/v1/jogos")
-    public ResponseEntity<Page<JogoV1Response>> listarV1(Pageable pageable) {
+    public ResponseEntity<Page<JogoV1Response>> listarV1(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok()
                 .header("X-API-Version", "v1")
                 .body(repository.findAll(pageable).map(this::toV1));
@@ -79,7 +80,7 @@ public class JogoVersionadoController {
             @ApiResponse(responseCode = "429", description = "Muitas requisicoes", content = @Content)
     })
     @GetMapping("/api/v2/jogos")
-    public ResponseEntity<Page<JogoV2Response>> listarV2(Pageable pageable) {
+    public ResponseEntity<Page<JogoV2Response>> listarV2(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok()
                 .header("X-API-Version", "v2")
                 .body(repository.findAll(pageable).map(this::toV2));

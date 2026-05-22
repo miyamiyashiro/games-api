@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,7 +73,7 @@ public class JogoController {
     })
     @Operation(summary = "Lista todos os jogos", description = "Retorna uma lista paginada com links HATEOAS")
     @GetMapping
-    public PagedModel<EntityModel<Jogo>> listarTodos(Pageable pageable) {
+    public PagedModel<EntityModel<Jogo>> listarTodos(@ParameterObject Pageable pageable) {
         Page<Jogo> jogos = repository.findAll(pageable);
         return pagedResourcesAssembler.toModel(jogos, this::criarModelo);
     }

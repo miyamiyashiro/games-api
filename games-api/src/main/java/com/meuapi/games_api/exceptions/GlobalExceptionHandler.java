@@ -3,6 +3,8 @@ package com.meuapi.games_api.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -55,7 +57,10 @@ public class GlobalExceptionHandler {
             ConstraintViolationException.class,
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class,
-            DataIntegrityViolationException.class
+            DataIntegrityViolationException.class,
+            InvalidDataAccessApiUsageException.class,
+            PropertyReferenceException.class,
+            IllegalArgumentException.class
     })
     public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "Nao foi possivel processar a requisicao", request,
