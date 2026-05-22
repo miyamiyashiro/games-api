@@ -111,12 +111,32 @@ public class PlataformaController {
     @Operation(summary = "Consulta personalizada por nome", description = "Busca plataformas por parte do nome")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Plataforma>> buscarPorNome(@RequestParam String nome) {
-        List<EntityModel<Plataforma>> plataformas = repository.findByNomeContainingIgnoreCase(nome).stream()
+        String termo = validarTermoBusca(nome, "nome");
+
+        List<EntityModel<Plataforma>> plataformas = repository.findByNomeContainingIgnoreCase(termo).stream()
                 .map(this::criarModelo)
                 .toList();
+
+        if (plataformas.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Nenhuma plataforma encontrada para o nome informado: " + termo);
+        }
+
         return CollectionModel.of(plataformas,
-                linkTo(methodOn(PlataformaController.class).buscarPorNome(nome)).withSelfRel(),
+                linkTo(methodOn(PlataformaController.class).buscarPorNome(termo)).withSelfRel(),
                 linkTo(methodOn(PlataformaController.class).listar(null)).withRel("lista"));
+    }
+
+    private String validarTermoBusca(String termo, String campo) {
+        if (termo == null || termo.isBlank()) {
+            throw new IllegalArgumentException("O parametro " + campo + " e obrigatorio.");
+        }
+
+        String termoTratado = termo.trim();
+        if (!termoTratado.matches(".*[A-Za-z].*")) {
+            throw new IllegalArgumentException("O parametro " + campo + " deve conter texto, nao apenas numeros ou simbolos.");
+        }
+
+        return termoTratado;
     }
 
     @ApiResponses(value = {

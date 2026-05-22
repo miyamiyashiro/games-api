@@ -154,12 +154,32 @@ public class JogoController {
     @Operation(summary = "Consulta personalizada", description = "Busca jogos por parte do título, sem diferenciar maiusculas e minusculas")
     @GetMapping("/busca")
     public CollectionModel<EntityModel<Jogo>> buscarPorTitulo(@RequestParam String titulo) {
-        List<EntityModel<Jogo>> jogos = repository.findByTituloContainingIgnoreCase(titulo).stream()
+        String termo = validarTermoBusca(titulo, "titulo");
+
+        List<EntityModel<Jogo>> jogos = repository.findByTituloContainingIgnoreCase(termo).stream()
                 .map(this::criarModelo)
                 .toList();
+
+        if (jogos.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Nenhum jogo encontrado para o titulo informado: " + termo);
+        }
+
         return CollectionModel.of(jogos,
-                linkTo(methodOn(JogoController.class).buscarPorTitulo(titulo)).withSelfRel(),
+                linkTo(methodOn(JogoController.class).buscarPorTitulo(termo)).withSelfRel(),
                 linkTo(methodOn(JogoController.class).listarTodos(null)).withRel("lista"));
+    }
+
+    private String validarTermoBusca(String termo, String campo) {
+        if (termo == null || termo.isBlank()) {
+            throw new IllegalArgumentException("O parametro " + campo + " e obrigatorio.");
+        }
+
+        String termoTratado = termo.trim();
+        if (!termoTratado.matches(".*[A-Za-z].*")) {
+            throw new IllegalArgumentException("O parametro " + campo + " deve conter texto, nao apenas numeros ou simbolos.");
+        }
+
+        return termoTratado;
     }
 
     private void preencherJogo(Jogo jogo, JogoRequest request) {

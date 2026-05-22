@@ -147,6 +147,11 @@ public class EmprestimoController {
         List<EntityModel<Emprestimo>> emprestimos = repository.findByDataEmprestimo(data).stream()
                 .map(this::criarModelo)
                 .toList();
+
+        if (emprestimos.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Nenhum emprestimo encontrado para a data informada: " + data);
+        }
+
         return CollectionModel.of(emprestimos,
                 linkTo(methodOn(EmprestimoController.class).buscarPorData(data)).withSelfRel(),
                 linkTo(methodOn(EmprestimoController.class).listarTodos(null)).withRel("lista"));

@@ -116,4 +116,43 @@ class GlobalExceptionHandlerTests {
                 .andExpect(jsonPath("$.mensagem").value("Parametros de paginacao invalidos"))
                 .andExpect(jsonPath("$.detalhes[0]").value(containsString("page, size e sort")));
     }
+
+    @Test
+    void deveRetornarBadRequestQuandoBuscaRecebeApenasNumeros() throws Exception {
+        mockMvc.perform(get("/jogos/busca")
+                        .param("titulo", "12345")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.86");
+                            return request;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Nao foi possivel processar a requisicao"))
+                .andExpect(jsonPath("$.detalhes[0]").value(containsString("deve conter texto")));
+    }
+
+    @Test
+    void deveRetornarNotFoundQuandoBuscaNaoTemResultado() throws Exception {
+        mockMvc.perform(get("/editoras/busca")
+                        .param("nome", "EditoraInexistenteParaTeste")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.87");
+                            return request;
+                        }))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.mensagem").value(containsString("Nenhuma editora encontrada")))
+                .andExpect(jsonPath("$.caminho").value("/editoras/busca"));
+    }
+
+    @Test
+    void deveManterOkQuandoBuscaTemResultado() throws Exception {
+        mockMvc.perform(get("/jogos/busca")
+                        .param("titulo", "Catan")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.88");
+                            return request;
+                        }))
+                .andExpect(status().isOk());
+    }
 }
