@@ -46,7 +46,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@Tag(name = "Emprestimos")
+@Tag(name = "Empréstimos")
 @RequestMapping("/emprestimos")
 public class EmprestimoController {
 
