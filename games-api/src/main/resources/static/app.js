@@ -10,6 +10,8 @@ const state = {
 const $ = (selector) => document.querySelector(selector);
 
 const elements = {
+  navLinks: document.querySelectorAll("[data-view-link]"),
+  views: document.querySelectorAll(".view"),
   baseUrl: $("#baseUrl"),
   saveBaseUrl: $("#saveBaseUrl"),
   apiHealth: $("#apiHealth"),
@@ -17,6 +19,7 @@ const elements = {
   searchTitle: $("#searchTitle"),
   searchGames: $("#searchGames"),
   loadGames: $("#loadGames"),
+  newGameButton: $("#newGameButton"),
   refreshResources: $("#refreshResources"),
   loadCatalogs: $("#loadCatalogs"),
   publishersList: $("#publishersList"),
@@ -46,6 +49,24 @@ const elements = {
 elements.baseUrl.value = state.baseUrl;
 elements.apiKey.value = state.apiKey;
 elements.userForm.email.value = `frontend-${Date.now()}@email.com`;
+
+function activateView(viewId, updateHash = true) {
+  elements.views.forEach((view) => {
+    view.classList.toggle("is-active", view.id === viewId);
+  });
+
+  elements.navLinks.forEach((link) => {
+    link.classList.toggle("is-active", link.dataset.viewLink === viewId);
+  });
+
+  if (updateHash) {
+    history.replaceState(null, "", `#${viewId}`);
+  }
+
+  if ((viewId === "recursos" || viewId === "cadastros") && !elements.publishersList.children.length) {
+    loadCatalogs();
+  }
+}
 
 function normalizeBaseUrl(value) {
   return value.trim().replace(/\/+$/, "");
@@ -299,6 +320,7 @@ async function startEditGame(id) {
   elements.gameFormTitle.textContent = "Editar jogo";
   elements.saveGameButton.textContent = "Salvar alteracoes";
   elements.cancelGameEdit.style.display = "inline-flex";
+  activateView("cadastros");
   document.querySelector("#cadastros").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -397,6 +419,7 @@ async function createGame(event) {
   if (result.ok) {
     resetGameForm();
     await loadGames();
+    activateView("acervo");
   }
 }
 
@@ -486,6 +509,16 @@ elements.saveBaseUrl.addEventListener("click", () => {
   loadGames();
 });
 
+elements.navLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    activateView(link.dataset.viewLink);
+  });
+});
+elements.newGameButton.addEventListener("click", () => {
+  resetGameForm();
+  activateView("cadastros");
+});
 elements.loadGames.addEventListener("click", loadGames);
 elements.searchGames.addEventListener("click", searchGames);
 elements.refreshResources.addEventListener("click", loadCatalogs);
@@ -547,5 +580,10 @@ elements.apiKey.addEventListener("input", () => {
   state.apiKey = elements.apiKey.value.trim();
   localStorage.setItem("gamesApiKey", state.apiKey);
 });
+
+const initialView = location.hash.replace("#", "");
+if (initialView && document.getElementById(initialView)?.classList.contains("view")) {
+  activateView(initialView, false);
+}
 
 loadGames();
