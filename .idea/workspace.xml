@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="" />
+    <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

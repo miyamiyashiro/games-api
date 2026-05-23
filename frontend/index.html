@@ -4,244 +4,300 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Games API Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260521">
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-block">
-        <div class="brand-mark" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="14" width="40" height="26" rx="5" fill="#1a1a2e" stroke="#7c3aed" stroke-width="2"/>
+          <circle cx="14" cy="27" r="4" fill="#7c3aed"/>
+          <circle cx="14" cy="27" r="2" fill="#c4b5fd"/>
+          <rect x="32" y="23" width="2" height="8" rx="1" fill="#7c3aed"/>
+          <rect x="28" y="25" width="8" height="2" rx="1" fill="#7c3aed"/>
+          <circle cx="24" cy="10" r="3" fill="#7c3aed" opacity="0.5"/>
+          <circle cx="34" cy="10" r="3" fill="#7c3aed" opacity="0.5"/>
+          <line x1="24" y1="10" x2="24" y2="14" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="2 1"/>
+          <line x1="34" y1="10" x2="34" y2="14" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="2 1"/>
+        </svg>
+      </div>
+      <div>
+        <p class="eyebrow">Projeto Final</p>
+        <h1>Games API</h1>
+      </div>
+    </div>
+
+    <nav class="nav-list" aria-label="Navegacao principal">
+      <a href="#acervo">🎮 Acervo</a>
+      <a href="#recursos">🗂️ Recursos</a>
+      <a href="#cadastros">➕ Cadastros</a>
+      <a href="#seguranca">🔑 API Key</a>
+      <a href="#testes">🧪 Testes HTTP</a>
+      <a href="#versionamento">🔀 Versoes</a>
+    </nav>
+
+    <section class="api-card">
+      <label for="baseUrl">Base da API</label>
+      <input id="baseUrl" type="url" value="https://games-api-3rqr.onrender.com">
+      <button id="saveBaseUrl" type="button">Aplicar</button>
+    </section>
+
+    <div class="sidebar-deco" aria-hidden="true">
+      <span>P1</span><span>P2</span><span>INSERT COIN</span>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="content">
+
+    <!-- Topbar -->
+    <section class="topbar">
+      <div>
+        <p class="eyebrow">Painel de demonstracao</p>
+        <h2>Frontend consumindo a API publicada</h2>
+      </div>
+      <a class="swagger-link" href="https://games-api-3rqr.onrender.com/swagger-ui/index.html" target="_blank" rel="noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Abrir Swagger
+      </a>
+    </section>
+
+    <!-- Status -->
+    <section class="status-grid" aria-label="Resumo dos requisitos">
+      <article>
+        <span>Parte I</span>
+        <strong>REST, HATEOAS e paginacao</strong>
+      </article>
+      <article>
+        <span>Parte II</span>
+        <strong>401, 409, 429 e CORS</strong>
+      </article>
+      <article class="status-live">
+        <span>Deploy</span>
+        <strong id="apiHealth">
+          <span class="pulse-dot"></span>
+          Aguardando teste
+        </strong>
+      </article>
+    </section>
+
+    <!-- ── ACERVO ── -->
+    <section id="acervo" class="panel">
+      <div class="section-heading">
         <div>
-          <p class="eyebrow">Projeto Final</p>
-          <h1>Games API</h1>
+          <p class="eyebrow">Acervo</p>
+          <h3>Jogos cadastrados</h3>
         </div>
       </div>
 
-      <nav class="nav-list" aria-label="Navegacao principal">
-        <a href="#acervo">Acervo</a>
-        <a href="#recursos">Recursos</a>
-        <a href="#cadastros">Cadastros</a>
-        <a href="#seguranca">API Key</a>
-        <a href="#testes">Testes HTTP</a>
-        <a href="#versionamento">Versoes</a>
-      </nav>
+      <!-- Search bar igual à colega -->
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="searchTitle" type="search" placeholder="Buscar jogo por titulo…">
+        </div>
+        <button id="searchGames" type="button" class="btn-primary">Buscar</button>
+        <button id="loadGames" type="button" class="btn-ghost">↺ Atualizar</button>
+      </div>
 
-      <section class="api-card">
-        <label for="baseUrl">Base da API</label>
-        <input id="baseUrl" type="url" value="https://games-api-3rqr.onrender.com">
-        <button id="saveBaseUrl" type="button">Aplicar</button>
-      </section>
-    </aside>
+      <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
+    </section>
 
-    <main class="content">
-      <section class="topbar">
+    <!-- ── RECURSOS ── -->
+    <section id="recursos" class="panel">
+      <div class="section-heading">
         <div>
-          <p class="eyebrow">Painel de demonstracao</p>
-          <h2>Frontend consumindo a API publicada</h2>
+          <p class="eyebrow">CRUD visual</p>
+          <h3>Editoras e plataformas</h3>
         </div>
-        <a class="swagger-link" href="https://games-api-3rqr.onrender.com/swagger-ui/index.html" target="_blank" rel="noreferrer">Abrir Swagger</a>
-      </section>
+        <button id="refreshResources" type="button" class="btn-ghost">↺ Atualizar recursos</button>
+      </div>
 
-      <section class="status-grid" aria-label="Resumo dos requisitos">
-        <article>
-          <span>Parte I</span>
-          <strong>REST, HATEOAS e paginacao</strong>
+      <div class="resource-grid">
+        <article class="resource-column">
+          <div class="resource-header">
+            <h4>🏢 Editoras</h4>
+            <p>Crie editoras e use o ID ao cadastrar jogos.</p>
+          </div>
+          <form id="publisherForm" class="inline-form">
+            <input name="nome" required placeholder="Nome da editora">
+            <button type="submit" class="btn-primary">Criar</button>
+          </form>
+          <div id="publishersCards" class="resource-list" aria-live="polite"></div>
         </article>
-        <article>
-          <span>Parte II</span>
-          <strong>401, 409, 429 e CORS</strong>
-        </article>
-        <article>
-          <span>Deploy</span>
-          <strong id="apiHealth">Aguardando teste</strong>
-        </article>
-      </section>
 
-      <section id="acervo" class="panel">
+        <article class="resource-column">
+          <div class="resource-header">
+            <h4>🕹️ Plataformas</h4>
+            <p>Crie plataformas e use o ID ao cadastrar jogos.</p>
+          </div>
+          <form id="platformForm" class="inline-form">
+            <input name="nome" required placeholder="Nome da plataforma">
+            <button type="submit" class="btn-primary">Criar</button>
+          </form>
+          <div id="platformsCards" class="resource-list" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── CADASTROS ── -->
+    <section id="cadastros" class="split-grid">
+      <article class="panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Acervo</p>
-            <h3>Jogos cadastrados</h3>
-          </div>
-          <div class="inline-actions">
-            <input id="searchTitle" type="search" placeholder="Buscar por titulo">
-            <button id="searchGames" type="button">Buscar</button>
-            <button id="loadGames" type="button">Atualizar</button>
+            <p class="eyebrow">Cadastro</p>
+            <h3 id="gameFormTitle">Novo jogo</h3>
           </div>
         </div>
-        <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
-      </section>
+        <form id="gameForm" class="form-grid">
+          <label>
+            Titulo
+            <input name="titulo" required placeholder="Ex: Azul">
+          </label>
+          <label>
+            Categoria
+            <select name="categoria" required>
+              <option value="TABULEIRO">TABULEIRO</option>
+              <option value="RPG">RPG</option>
+              <option value="CARTAS">CARTAS</option>
+              <option value="ESTRATEGIA">ESTRATEGIA</option>
+              <option value="PARTY_GAME">PARTY_GAME</option>
+            </select>
+          </label>
+          <label>
+            Editora ID
+            <input name="editoraId" type="number" min="1" value="1" required>
+          </label>
+          <label>
+            Plataforma ID
+            <input name="plataformaId" type="number" min="1" value="1" required>
+          </label>
+          <button id="saveGameButton" type="submit" class="btn-primary">Criar jogo com API Key</button>
+          <button id="cancelGameEdit" class="btn-ghost" type="button">Cancelar edicao</button>
+        </form>
+      </article>
 
-      <section id="recursos" class="panel">
+      <article class="panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">CRUD visual</p>
+            <p class="eyebrow">Apoio</p>
             <h3>Editoras e plataformas</h3>
           </div>
-          <button id="refreshResources" type="button">Atualizar recursos</button>
+          <button id="loadCatalogs" type="button" class="btn-ghost">Carregar</button>
         </div>
-
-        <div class="resource-grid">
-          <article class="resource-column">
-            <div class="resource-header">
-              <div>
-                <h4>Editoras</h4>
-                <p>Crie editoras e use o ID ao cadastrar jogos.</p>
-              </div>
-            </div>
-            <form id="publisherForm" class="inline-form">
-              <input name="nome" required placeholder="Nome da editora">
-              <button type="submit">Criar</button>
-            </form>
-            <div id="publishersCards" class="resource-list" aria-live="polite"></div>
-          </article>
-
-          <article class="resource-column">
-            <div class="resource-header">
-              <div>
-                <h4>Plataformas</h4>
-                <p>Crie plataformas e use o ID ao cadastrar jogos.</p>
-              </div>
-            </div>
-            <form id="platformForm" class="inline-form">
-              <input name="nome" required placeholder="Nome da plataforma">
-              <button type="submit">Criar</button>
-            </form>
-            <div id="platformsCards" class="resource-list" aria-live="polite"></div>
-          </article>
+        <div class="compact-lists">
+          <div>
+            <h4>Editoras</h4>
+            <ul id="publishersList"></ul>
+          </div>
+          <div>
+            <h4>Plataformas</h4>
+            <ul id="platformsList"></ul>
+          </div>
         </div>
-      </section>
+      </article>
+    </section>
 
-      <section id="cadastros" class="split-grid">
-        <article class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Cadastro</p>
-              <h3 id="gameFormTitle">Novo jogo</h3>
-            </div>
-          </div>
-          <form id="gameForm" class="form-grid">
-            <label>
-              Titulo
-              <input name="titulo" required placeholder="Ex: Azul">
-            </label>
-            <label>
-              Categoria
-              <select name="categoria" required>
-                <option value="TABULEIRO">TABULEIRO</option>
-                <option value="RPG">RPG</option>
-                <option value="CARTAS">CARTAS</option>
-                <option value="ESTRATEGIA">ESTRATEGIA</option>
-                <option value="PARTY_GAME">PARTY_GAME</option>
-              </select>
-            </label>
-            <label>
-              Editora ID
-              <input name="editoraId" type="number" min="1" value="1" required>
-            </label>
-            <label>
-              Plataforma ID
-              <input name="plataformaId" type="number" min="1" value="1" required>
-            </label>
-            <button id="saveGameButton" type="submit">Criar jogo com API Key</button>
-            <button id="cancelGameEdit" class="secondary-button" type="button">Cancelar edicao</button>
-          </form>
-        </article>
-
-        <article class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Apoio</p>
-              <h3>Editoras e plataformas</h3>
-            </div>
-            <button id="loadCatalogs" type="button">Carregar</button>
-          </div>
-          <div class="compact-lists">
-            <div>
-              <h4>Editoras</h4>
-              <ul id="publishersList"></ul>
-            </div>
-            <div>
-              <h4>Plataformas</h4>
-              <ul id="platformsList"></ul>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section id="seguranca" class="split-grid">
-        <article class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">API Key</p>
-              <h3>Criar usuario e gerar chave</h3>
-            </div>
-          </div>
-          <form id="userForm" class="form-grid">
-            <label>
-              Nome
-              <input name="nome" required value="Usuario Frontend">
-            </label>
-            <label>
-              E-mail
-              <input name="email" type="email" required>
-            </label>
-            <button type="submit">Criar usuario</button>
-          </form>
-          <div class="key-row">
-            <input id="apiKey" type="text" placeholder="A API Key aparece aqui">
-            <button id="copyKey" type="button">Copiar</button>
-          </div>
-        </article>
-
-        <article class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Resposta</p>
-              <h3>Ultima chamada</h3>
-            </div>
-            <button id="clearLog" type="button">Limpar</button>
-          </div>
-          <pre id="responseLog" class="response-log">Nenhuma chamada executada ainda.</pre>
-        </article>
-      </section>
-
-      <section id="testes" class="panel">
+    <!-- ── API KEY ── -->
+    <section id="seguranca" class="split-grid">
+      <article class="panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Testes exigidos</p>
-            <h3>Erros HTTP da Parte II</h3>
+            <p class="eyebrow">API Key</p>
+            <h3>Criar usuario e gerar chave</h3>
           </div>
         </div>
-        <div class="test-actions">
-          <button id="test401" type="button">Testar 401 sem API Key</button>
-          <button id="test409First" type="button">Enviar 1a idempotencia</button>
-          <button id="test409Second" type="button">Testar 409 com JSON alterado</button>
-          <button id="test429" type="button">Disparar 429</button>
+        <form id="userForm" class="form-grid">
+          <label>
+            Nome
+            <input name="nome" required value="Usuario Frontend">
+          </label>
+          <label>
+            E-mail
+            <input name="email" type="email" required>
+          </label>
+          <button type="submit" class="btn-primary">✨ Criar usuario e gerar chave</button>
+        </form>
+        <div class="key-row">
+          <div class="key-display">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <input id="apiKey" type="text" placeholder="A API Key aparece aqui apos criar usuario">
+          </div>
+          <button id="copyKey" type="button" class="btn-ghost">Copiar</button>
         </div>
-      </section>
+      </article>
 
-      <section id="versionamento" class="panel">
+      <article class="panel">
         <div class="section-heading">
+          <div>
+            <p class="eyebrow">Resposta</p>
+            <h3>Ultima chamada</h3>
+          </div>
+          <button id="clearLog" type="button" class="btn-ghost">Limpar</button>
+        </div>
+        <pre id="responseLog" class="response-log">// Nenhuma chamada executada ainda.</pre>
+      </article>
+    </section>
+
+    <!-- ── TESTES ── -->
+    <section id="testes" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Testes exigidos</p>
+          <h3>Erros HTTP da Parte II</h3>
+        </div>
+      </div>
+      <div class="test-actions">
+        <button id="test401" type="button" class="test-btn test-danger">
+          <span class="test-code">401</span>
+          Sem API Key
+        </button>
+        <button id="test409First" type="button" class="test-btn test-warn">
+          <span class="test-code">1ª</span>
+          Idempotencia A
+        </button>
+        <button id="test409Second" type="button" class="test-btn test-warn">
+          <span class="test-code">409</span>
+          JSON alterado
+        </button>
+        <button id="test429" type="button" class="test-btn test-slate">
+          <span class="test-code">429</span>
+          Rate Limit
+        </button>
+      </div>
+    </section>
+
+    <!-- ── VERSIONAMENTO ── -->
+    <section id="versionamento" class="panel">
+      <div class="section-heading">
         <div>
           <p class="eyebrow">Versionamento</p>
           <h3>Comparar contratos de jogos v1 e v2</h3>
         </div>
-        <button id="loadVersions" type="button">Comparar</button>
+        <button id="loadVersions" type="button" class="btn-primary">Comparar</button>
       </div>
       <div class="version-grid">
+        <div class="version-pane">
+          <div class="version-label">v1</div>
           <pre id="versionOne">GET /api/v1/jogos</pre>
+        </div>
+        <div class="version-pane">
+          <div class="version-label">v2</div>
           <pre id="versionTwo">GET /api/v2/jogos</pre>
+        </div>
       </div>
     </section>
-    </main>
-  </div>
 
-  <script src="app.js?v=20260521"></script>
+  </main>
+</div>
+
+<script src="app.js?v=20260521"></script>
 </body>
 </html>

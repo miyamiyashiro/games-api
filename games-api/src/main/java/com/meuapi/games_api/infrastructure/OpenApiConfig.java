@@ -75,14 +75,14 @@ import java.util.Set;
                 contact = @Contact(name = "Luana Miyashiro")
         ),
         tags = {
-                @Tag(name = "Jogos", description = "Recurso central do acervo. Demonstra enum, paginacao, HATEOAS, Many-to-One com Editora e Many-to-Many com Plataformas."),
-                @Tag(name = "Usuarios", description = "Clientes que podem realizar emprestimos. Tambem fornece o fluxo publico para gerar X-API-Key."),
+                @Tag(name = "Jogos", description = "Recurso central do acervo. Demonstra enum, paginação, HATEOAS, Many-to-One com Editora, One to one com Detalhes dos Jogos e Many-to-Many com Plataformas."),
+                @Tag(name = "Usuários", description = "Clientes que podem realizar empréstimos. Também fornece o fluxo público para gerar X-API-Key. One to Many com empréstimos."),
                 @Tag(name = "Editoras", description = "Editoras dos jogos. Demonstra One-to-Many com Jogos e consulta personalizada por nome."),
                 @Tag(name = "Plataformas", description = "Plataformas ou formatos dos jogos. Demonstra Many-to-Many com Jogos."),
-                @Tag(name = "Emprestimos", description = "Controle de emprestimos, relacionando Usuario e Jogo com validacao de datas."),
-                @Tag(name = "Detalhes dos Jogos", description = "Informacoes complementares em relacionamento One-to-One com Jogo."),
+                @Tag(name = "Empréstimos", description = "Controle de empréstimos, relacionando Usuário e Jogo com validação de datas."),
+                @Tag(name = "Detalhes dos Jogos", description = "Informações complementares em relacionamento One-to-One com Jogo."),
                 @Tag(name = "Versionamento", description = "Endpoints auxiliares de status em v1 e v2."),
-                @Tag(name = "Jogos Versionados", description = "Contratos v1 e v2 do recurso Jogos, demonstrando evolucao de resposta por URL.")
+                @Tag(name = "Jogos Versionados", description = "Contratos v1 e v2 do recurso Jogos, demonstrando evolução de resposta por URL.")
         }
 )
 public class OpenApiConfig {
