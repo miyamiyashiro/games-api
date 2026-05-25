@@ -4,12 +4,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +63,37 @@ class GlobalExceptionHandlerTests {
     }
 
     @Test
+    void deveRetornarConflictParaEmailJaCadastrado() throws Exception {
+        String email = "email-duplicado-%s@example.com".formatted(UUID.randomUUID());
+        String body = """
+                {
+                  "nome": "Usuario Duplicado",
+                  "email": "%s"
+                }
+                """.formatted(email);
+
+        mockMvc.perform(post("/usuarios")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.89");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/usuarios")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.90");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.mensagem").value("Conflito com dados ja cadastrados"));
+    }
+
+    @Test
     void deveRetornarErroPadronizadoParaJsonInvalidoComIdempotencyKey() throws Exception {
         mockMvc.perform(post("/usuarios")
                         .with(request -> {
@@ -75,16 +111,54 @@ class GlobalExceptionHandlerTests {
 
     @Test
     void deveRetornarErroPadronizadoParaMetodoNaoPermitido() throws Exception {
-        mockMvc.perform(get("/usuarios/1/api-key")
+        String sufixo = UUID.randomUUID().toString();
+
+        MvcResult usuarioCriado = mockMvc.perform(post("/usuarios")
                         .with(request -> {
                             request.setRemoteAddr("203.0.113.83");
                             return request;
-                        }))
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Usuario metodo nao permitido",
+                                  "email": "metodo-nao-permitido-%s@example.com"
+                                }
+                                """.formatted(sufixo)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String usuarioJson = usuarioCriado.getResponse().getContentAsString();
+        String usuarioId = usuarioJson.replaceAll(".*\"id\":(\\d+).*", "$1");
+
+        MvcResult chaveGerada = mockMvc.perform(post("/api-keys")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.83");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "usuarioId": %s
+                                }
+                                """.formatted(usuarioId)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String apiKeyJson = chaveGerada.getResponse().getContentAsString();
+        String apiKey = apiKeyJson.replaceAll(".*\"apiKey\":\"([^\"]+)\".*", "$1");
+
+        mockMvc.perform(request(HttpMethod.POST, "/api-keys/{id}", usuarioId)
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.83");
+                            return request;
+                        })
+                        .header("X-API-Key", apiKey))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.status").value(405))
                 .andExpect(jsonPath("$.mensagem").value("Metodo HTTP nao permitido para este endpoint"))
-                .andExpect(jsonPath("$.caminho").value("/usuarios/1/api-key"))
-                .andExpect(jsonPath("$.metodo").value("GET"));
+                .andExpect(jsonPath("$.caminho").value("/api-keys/" + usuarioId))
+                .andExpect(jsonPath("$.metodo").value("POST"));
     }
 
     @Test
@@ -115,6 +189,31 @@ class GlobalExceptionHandlerTests {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.mensagem").value("Parametros de paginacao invalidos"))
                 .andExpect(jsonPath("$.detalhes[0]").value(containsString("page, size e sort")));
+    }
+
+    @Test
+    void deveRetornarBadRequestParaEmailComFormatoInvalido() throws Exception {
+        mockMvc.perform(get("/usuarios/email/123")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.86");
+                            return request;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Nao foi possivel processar a requisicao"))
+                .andExpect(jsonPath("$.detalhes[0]").value(containsString("email deve estar em formato valido")));
+    }
+
+    @Test
+    void deveRetornarNotFoundParaEmailValidoNaoCadastrado() throws Exception {
+        mockMvc.perform(get("/usuarios/email/nao-existe@example.com")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.87");
+                            return request;
+                        }))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.mensagem").value(containsString("nao-existe@example.com")));
     }
 
     @Test

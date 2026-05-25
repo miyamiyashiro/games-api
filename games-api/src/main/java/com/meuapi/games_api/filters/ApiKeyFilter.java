@@ -83,7 +83,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             return false;
         }
 
-        return !("POST".equals(metodo) && path.matches("/usuarios/\\d+/api-key"));
+        return true;
     }
 
     private void escreverRespostaNaoAutorizada(
@@ -102,7 +102,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 "Acesso negado: informe uma chave de API valida no header X-API-Key.",
                 request.getRequestURI(),
                 request.getMethod(),
-                List.of(detalhe, "Gere sua chave em: POST /usuarios/{id}/api-key")
+                List.of(detalhe, "Gere sua chave em: POST /api-keys")
         );
 
         objectMapper.writeValue(response.getWriter(), corpo);

@@ -30,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.UUID;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -63,8 +60,8 @@ public class UsuarioController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail já cadastrado"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência ou e-mail já cadastrado"),
             @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
     })
     @Operation(summary = "Cadastra um novo usuário", description = "Cria um perfil de cliente para realizar empréstimos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
@@ -74,23 +71,6 @@ public class UsuarioController {
         usuario.setNome(request.nome());
         usuario.setEmail(request.email());
         return ResponseEntity.status(HttpStatus.CREATED).body(criarModelo(repository.save(usuario)));
-    }
-
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Chave de API gerada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Usuario nao encontrado")
-    })
-    @Operation(summary = "Gera chave de API", description = "Cria ou renova a chave usada no header X-API-Key")
-    @PostMapping("/{id}/api-key")
-    public ResponseEntity<Map<String, String>> gerarApiKey(@PathVariable Long id) {
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(id));
-        usuario.setApiKey(UUID.randomUUID().toString());
-        repository.save(usuario);
-
-        return ResponseEntity.ok(Map.of(
-                "usuarioId", usuario.getId().toString(),
-                "apiKey", usuario.getApiKey()
-        ));
     }
 
     @ApiResponses(value = {
@@ -125,12 +105,19 @@ public class UsuarioController {
     @Operation(summary = "Busca usuário por e-mail", description = "Consulta personalizada por e-mail exato")
     @GetMapping("/email/{email}")
     public ResponseEntity<EntityModel<Usuario>> buscarPorEmail(@PathVariable String email) {
+        validarFormatoEmail(email);
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com e-mail: " + email));
         return ResponseEntity.ok(EntityModel.of(usuario,
                 linkTo(methodOn(UsuarioController.class).buscarPorEmail(email)).withSelfRel(),
                 linkTo(methodOn(UsuarioController.class).buscarPorId(usuario.getId())).withRel("usuario"),
                 linkTo(methodOn(UsuarioController.class).listarTodos(null)).withRel("lista")));
+    }
+
+    private void validarFormatoEmail(String email) {
+        if (email == null || email.isBlank() || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new IllegalArgumentException("O parametro email deve estar em formato valido, por exemplo: luana@email.com.");
+        }
     }
 
     @ApiResponses(value = {

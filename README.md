@@ -52,7 +52,7 @@ Autora: Luana Miyashiro Salles de Oliveira
 | Requisito | Como foi atendido |
 | :--- | :--- |
 | `HTTP 401 Unauthorized` | Escritas protegidas exigem `X-API-Key`; chave ausente ou inválida retorna `401` |
-| API Key | Usuário cria conta, gera chave em `POST /usuarios/{id}/api-key` e usa o header `X-API-Key` |
+| API Key | Usuário cria conta, gera chave em `POST /api-keys` e usa o header `X-API-Key` |
 | `HTTP 429 Too Many Requests` | Rate limit por IP com bloqueio de 30 segundos ao exceder o limite |
 | Idempotência | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
 | `HTTP 409 Conflict` | Mesma chave de idempotência com JSON diferente retorna `409` |
@@ -102,7 +102,10 @@ O sistema foi modelado para demonstrar os principais tipos de relacionamento exi
 | Plataformas | `GET /plataformas/busca?nome=tabuleiro` | Consulta personalizada por nome |
 | Emprestimos | `GET /emprestimos/data?data=2026-04-11` | Consulta personalizada por data |
 | DetalhesJogo | `GET /detalhes-jogos/jogo/1` | Consulta personalizada pelo ID do jogo |
-| API Key | `POST /usuarios/{id}/api-key` | Gera a chave usada no header `X-API-Key` |
+| API Key | `POST /api-keys` | Gera ou renova a chave usada no header `X-API-Key` |
+| API Key | `GET /api-keys` | Lista chaves ativas com valor mascarado |
+| API Key | `GET /api-keys/{id}` | Busca a chave vinculada ao usuario pelo ID do usuario |
+| API Key | `DELETE /api-keys/{id}` | Revoga a chave vinculada ao usuario |
 | Versionamento | `GET /api/v1/jogos` | Versão simplificada do recurso Jogos |
 | Versionamento | `GET /api/v2/jogos` | Versão completa do recurso Jogos com HATEOAS |
 | Versionamento | `GET /api/v1/status` | Status simples da API |
@@ -117,7 +120,7 @@ Operações sensíveis de escrita exigem o header `X-API-Key`. As consultas `GET
 Fluxo:
 
 1. Crie um usuário com `POST /usuarios`.
-2. Gere a chave com `POST /usuarios/{id}/api-key`.
+2. Gere a chave com `POST /api-keys`, informando o `usuarioId`.
 3. Envie a chave no header `X-API-Key` ao criar, atualizar ou excluir recursos protegidos.
 
 Se a chave estiver ausente ou inválida, a API retorna `HTTP 401 Unauthorized`.
@@ -218,7 +221,7 @@ Também existem endpoints auxiliares de status:
 3. Executar `GET /jogos?page=0&size=5` e mostrar paginação e links HATEOAS.
 4. Executar uma consulta personalizada, como `GET /jogos/busca?titulo=catan`.
 5. Criar um usuário com `POST /usuarios`.
-6. Gerar a chave com `POST /usuarios/{id}/api-key`.
+6. Gerar a chave com `POST /api-keys`.
 7. Tentar criar uma editora sem `X-API-Key` e demonstrar o erro `401`.
 8. Repetir a criaçãoo com `X-API-Key` e demonstrar sucesso.
 9. Enviar duas requisições com a mesma `Idempotency-Key`, alterando o JSON na segunda, e demonstrar `409`.

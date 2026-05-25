@@ -378,8 +378,13 @@ async function createUser(event) {
   state.usuarioId = usuarioId;
   localStorage.setItem("gamesApiUsuarioId", usuarioId);
 
-  const keyResult = await request(`/usuarios/${usuarioId}/api-key`, {
-    method: "POST"
+  const keyResult = await request("/api-keys", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `frontend-api-key-${Date.now()}`
+    },
+    body: JSON.stringify({ usuarioId })
   });
 
   if (keyResult.data?.apiKey) {
@@ -388,7 +393,7 @@ async function createUser(event) {
     localStorage.setItem("gamesApiKey", state.apiKey);
   }
 
-  logResponse("POST /usuarios + POST /usuarios/{id}/api-key", `${userResult.status}/${keyResult.status}`, {
+  logResponse("POST /usuarios + POST /api-keys", `${userResult.status}/${keyResult.status}`, {
     usuario: userResult.data,
     chave: keyResult.data
   }, keyResult.headers);

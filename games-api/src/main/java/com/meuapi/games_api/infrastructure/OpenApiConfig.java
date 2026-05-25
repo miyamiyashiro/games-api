@@ -31,7 +31,7 @@ import java.util.Set;
         type = SecuritySchemeType.APIKEY,
         in = SecuritySchemeIn.HEADER,
         paramName = "X-API-Key",
-        description = "Chave de API gerada pelo endpoint POST /usuarios/{id}/api-key. " +
+        description = "Chave de API gerada pelo endpoint POST /api-keys. " +
                       "Obrigatoria para POST, PUT, PATCH e DELETE. GETs sao publicos."
 )
 @OpenAPIDefinition(
@@ -49,11 +49,11 @@ import java.util.Set;
                         "- Consultas personalizadas, tratamento global de erros, README, colecao Postman e deploy.\n\n" +
                         "## Parte II - Autenticacao com X-API-Key (HTTP 401)\n" +
                         "Operacoes de escrita (POST, PUT, PATCH, DELETE) exigem o header `X-API-Key`.\n" +
-                        "Consultas GET, `POST /usuarios`, `POST /usuarios/{id}/api-key` e `POST /api-keys` sao publicos para permitir o fluxo inicial. " +
+                        "Consultas GET, `POST /usuarios` e `POST /api-keys` sao publicos para permitir o fluxo inicial. " +
                         "O gerenciamento em `GET /api-keys`, `GET /api-keys/{id}` e `DELETE /api-keys/{id}` exige chave valida.\n" +
                         "Sem a chave ou com uma chave invalida, a API retorna **401 Unauthorized**.\n" +
                         "Fluxo: 1) Crie um usuario em `POST /usuarios` | " +
-                        "2) Gere sua chave em `POST /usuarios/{id}/api-key` ou `POST /api-keys` | " +
+                        "2) Gere sua chave em `POST /api-keys` | " +
                         "3) Use a chave no header `X-API-Key` em todas as operacoes de escrita.\n\n" +
                         "## Parte II - Rate Limiting (HTTP 429)\n" +
                         "Limite de 10 requisicoes por minuto por IP. " +
@@ -77,7 +77,7 @@ import java.util.Set;
         ),
         tags = {
                 @Tag(name = "Jogos", description = "Recurso central do acervo. Demonstra enum, paginação, HATEOAS, Many-to-One com Editora, One to one com Detalhes dos Jogos e Many-to-Many com Plataformas."),
-                @Tag(name = "Usuários", description = "Clientes que podem realizar empréstimos. Também fornece o fluxo público para gerar X-API-Key. One to Many com empréstimos."),
+                @Tag(name = "Usuários", description = "Clientes que podem realizar empréstimos. One to Many com empréstimos."),
                 @Tag(name = "Editoras", description = "Editoras dos jogos. Demonstra One-to-Many com Jogos e consulta personalizada por nome."),
                 @Tag(name = "Plataformas", description = "Plataformas ou formatos dos jogos. Demonstra Many-to-Many com Jogos."),
                 @Tag(name = "Empréstimos", description = "Controle de empréstimos, relacionando Usuário e Jogo com validação de datas."),
@@ -113,6 +113,10 @@ public class OpenApiConfig {
                         addResponseIfAbsent(operation, "400", "Requisicao invalida, JSON mal formatado ou dados fora do contrato.");
                         addResponseIfAbsent(operation, "429", "Muitas requisicoes. O cliente deve aguardar o tempo indicado em Retry-After.");
 
+                        if (isCustomSearchRoute(method, path)) {
+                            addResponseIfAbsent(operation, "404", "Nenhum registro encontrado para os parametros informados.");
+                        }
+
                         if (protectedOperation) {
                             operation.addSecurityItem(new SecurityRequirement().addList("ApiKeyAuth"));
                             addResponseIfAbsent(operation, "401", "Chave de API ausente ou invalida.");
@@ -132,12 +136,20 @@ public class OpenApiConfig {
 
     private boolean isPublicBootstrapRoute(PathItem.HttpMethod method, String path) {
         return method == PathItem.HttpMethod.POST
-                && ("/usuarios".equals(path) || "/usuarios/{id}/api-key".equals(path) || "/api-keys".equals(path));
+                && ("/usuarios".equals(path) || "/api-keys".equals(path));
     }
 
     private boolean isProtectedApiKeyManagementRoute(PathItem.HttpMethod method, String path) {
         return ("/api-keys".equals(path) || "/api-keys/{id}".equals(path))
                 && method != PathItem.HttpMethod.POST;
+    }
+
+    private boolean isCustomSearchRoute(PathItem.HttpMethod method, String path) {
+        return method == PathItem.HttpMethod.GET
+                && (path.contains("/busca")
+                || path.contains("/data")
+                || path.contains("/email/")
+                || path.contains("/jogo/"));
     }
 
     private void addResponseIfAbsent(Operation operation, String code, String description) {

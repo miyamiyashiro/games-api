@@ -57,7 +57,6 @@ public class GlobalExceptionHandler {
             ConstraintViolationException.class,
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class,
-            DataIntegrityViolationException.class,
             InvalidDataAccessApiUsageException.class,
             PropertyReferenceException.class,
             IllegalArgumentException.class
@@ -65,6 +64,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "Nao foi possivel processar a requisicao", request,
                 List.of(mensagemSegura(ex)));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConflict(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.CONFLICT, "Conflito com dados ja cadastrados", request,
+                List.of("Verifique campos unicos, como e-mail de usuario ou chave de API."));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

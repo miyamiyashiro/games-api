@@ -66,11 +66,17 @@ class ApiKeyFilterTests {
         String usuarioJson = usuarioCriado.getResponse().getContentAsString();
         String usuarioId = usuarioJson.replaceAll(".*\"id\":(\\d+).*", "$1");
 
-        MvcResult chaveGerada = mockMvc.perform(post("/usuarios/{id}/api-key", usuarioId)
+        MvcResult chaveGerada = mockMvc.perform(post("/api-keys")
                         .with(request -> {
                             request.setRemoteAddr("203.0.113.31");
                             return request;
-                        }))
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "usuarioId": %s
+                                }
+                                """.formatted(usuarioId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.apiKey").isString())
                 .andReturn();
