@@ -201,6 +201,20 @@
             <button type="submit" class="btn-primary">Criar usuario e gerar chave</button>
           </form>
           <button id="copyKey" type="button" class="btn-secondary">Copiar chave ativa</button>
+          <div class="divider"></div>
+          <form id="apiKeyForm" class="form-grid compact-form">
+            <label>
+              ID do usuario
+              <input name="usuarioId" type="number" min="1" required placeholder="Ex: 1">
+            </label>
+            <button type="submit" class="btn-primary">Gerar para usuario existente</button>
+          </form>
+          <div class="management-actions">
+            <input id="apiKeyLookupId" type="number" min="1" placeholder="ID do usuario/chave">
+            <button id="listApiKeys" type="button" class="btn-secondary">Listar</button>
+            <button id="getApiKey" type="button" class="btn-secondary">Buscar</button>
+            <button id="revokeApiKey" type="button" class="btn-danger">Revogar</button>
+          </div>
         </article>
 
         <article class="workspace">

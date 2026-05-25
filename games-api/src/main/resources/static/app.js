@@ -33,6 +33,11 @@ const elements = {
   saveGameButton: $("#saveGameButton"),
   cancelGameEdit: $("#cancelGameEdit"),
   userForm: $("#userForm"),
+  apiKeyForm: $("#apiKeyForm"),
+  apiKeyLookupId: $("#apiKeyLookupId"),
+  listApiKeys: $("#listApiKeys"),
+  getApiKey: $("#getApiKey"),
+  revokeApiKey: $("#revokeApiKey"),
   apiKey: $("#apiKey"),
   copyKey: $("#copyKey"),
   responseLog: $("#responseLog"),
@@ -389,6 +394,76 @@ async function createUser(event) {
   }, keyResult.headers);
 }
 
+async function generateApiKey(event) {
+  event.preventDefault();
+
+  const form = new FormData(elements.apiKeyForm);
+  const usuarioId = Number(form.get("usuarioId"));
+  const result = await request("/api-keys", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `frontend-api-key-${Date.now()}`
+    },
+    body: JSON.stringify({ usuarioId })
+  });
+
+  if (result.data?.apiKey) {
+    state.apiKey = result.data.apiKey;
+    elements.apiKey.value = state.apiKey;
+    localStorage.setItem("gamesApiKey", state.apiKey);
+  }
+
+  logResponse("POST /api-keys", result.status, result.data, result.headers);
+}
+
+function apiKeyAuthHeaders() {
+  return {
+    "X-API-Key": elements.apiKey.value.trim()
+  };
+}
+
+async function listApiKeys() {
+  const result = await request("/api-keys", {
+    headers: apiKeyAuthHeaders()
+  });
+
+  logResponse("GET /api-keys", result.status, result.data, result.headers);
+}
+
+async function getApiKey() {
+  const id = elements.apiKeyLookupId.value.trim();
+  if (!id) {
+    logResponse("GET /api-keys/{id}", "campo obrigatorio", {
+      mensagem: "Informe o ID do usuario/chave antes de buscar."
+    });
+    return;
+  }
+
+  const result = await request(`/api-keys/${id}`, {
+    headers: apiKeyAuthHeaders()
+  });
+
+  logResponse(`GET /api-keys/${id}`, result.status, result.data, result.headers);
+}
+
+async function revokeApiKey() {
+  const id = elements.apiKeyLookupId.value.trim();
+  if (!id) {
+    logResponse("DELETE /api-keys/{id}", "campo obrigatorio", {
+      mensagem: "Informe o ID do usuario/chave antes de revogar."
+    });
+    return;
+  }
+
+  const result = await request(`/api-keys/${id}`, {
+    method: "DELETE",
+    headers: apiKeyAuthHeaders()
+  });
+
+  logResponse(`DELETE /api-keys/${id}`, result.status, result.data || { mensagem: "Chave revogada" }, result.headers);
+}
+
 async function createGame(event) {
   event.preventDefault();
 
@@ -559,6 +634,10 @@ elements.platformsCards.addEventListener("click", (event) => {
   }
 });
 elements.userForm.addEventListener("submit", createUser);
+elements.apiKeyForm.addEventListener("submit", generateApiKey);
+elements.listApiKeys.addEventListener("click", listApiKeys);
+elements.getApiKey.addEventListener("click", getApiKey);
+elements.revokeApiKey.addEventListener("click", revokeApiKey);
 elements.gameForm.addEventListener("submit", createGame);
 elements.cancelGameEdit.addEventListener("click", resetGameForm);
 elements.test401.addEventListener("click", test401);

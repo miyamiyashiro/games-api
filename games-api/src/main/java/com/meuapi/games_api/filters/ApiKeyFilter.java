@@ -65,13 +65,17 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String metodo = request.getMethod().toUpperCase();
         String path = request.getRequestURI();
 
-        if (!METODOS_PROTEGIDOS.contains(metodo)) {
-            return false;
-        }
-
         if (path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/h2-console")) {
+            return false;
+        }
+
+        if (path.startsWith("/api-keys")) {
+            return !("POST".equals(metodo) && path.equals("/api-keys"));
+        }
+
+        if (!METODOS_PROTEGIDOS.contains(metodo)) {
             return false;
         }
 

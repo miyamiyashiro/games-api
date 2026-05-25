@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -89,5 +91,85 @@ class ApiKeyFilterTests {
                                 }
                                 """.formatted(sufixo)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deveGerenciarChavesDeApiERevogarAcesso() throws Exception {
+        String sufixo = UUID.randomUUID().toString();
+        String ip = "203.0.113.32";
+
+        MvcResult usuarioCriado = mockMvc.perform(post("/usuarios")
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Usuario gerenciamento API Key",
+                                  "email": "api-key-gerenciamento-%s@example.com"
+                                }
+                                """.formatted(sufixo)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String usuarioJson = usuarioCriado.getResponse().getContentAsString();
+        String usuarioId = usuarioJson.replaceAll(".*\"id\":(\\d+).*", "$1");
+
+        MvcResult chaveGerada = mockMvc.perform(post("/api-keys")
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "usuarioId": %s
+                                }
+                                """.formatted(usuarioId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.apiKey").isString())
+                .andReturn();
+
+        String apiKeyJson = chaveGerada.getResponse().getContentAsString();
+        String apiKey = apiKeyJson.replaceAll(".*\"apiKey\":\"([^\"]+)\".*", "$1");
+
+        mockMvc.perform(get("/api-keys")
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        }))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api-keys/{id}", usuarioId)
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        })
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("********")));
+
+        mockMvc.perform(delete("/api-keys/{id}", usuarioId)
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        })
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(post("/editoras")
+                        .with(request -> {
+                            request.setRemoteAddr(ip);
+                            return request;
+                        })
+                        .header("X-API-Key", apiKey)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Editora chave revogada %s"
+                                }
+                                """.formatted(sufixo)))
+                .andExpect(status().isUnauthorized());
     }
 }
