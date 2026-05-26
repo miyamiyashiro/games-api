@@ -162,6 +162,12 @@ public class EmprestimoController {
         Jogo jogo = jogoRepository.findById(request.jogoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Jogo não encontrado com ID: " + request.jogoId()));
 
+        if (request.dataEmprestimo() != null
+                && request.dataDevolucao() != null
+                && request.dataDevolucao().isBefore(request.dataEmprestimo())) {
+            throw new IllegalArgumentException("A data de devolucao nao pode ser anterior a data de emprestimo.");
+        }
+
         emprestimo.setDataEmprestimo(request.dataEmprestimo());
         emprestimo.setDataDevolucao(request.dataDevolucao());
         emprestimo.setUsuario(usuario);

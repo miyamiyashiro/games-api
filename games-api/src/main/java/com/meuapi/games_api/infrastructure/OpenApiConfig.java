@@ -160,6 +160,7 @@ public class OpenApiConfig {
         return method == PathItem.HttpMethod.POST
                 || method == PathItem.HttpMethod.PUT
                 || method == PathItem.HttpMethod.PATCH
+                || (method == PathItem.HttpMethod.GET && "/usuarios".equals(path))
                 || isCustomSearchRoute(method, path);
     }
 

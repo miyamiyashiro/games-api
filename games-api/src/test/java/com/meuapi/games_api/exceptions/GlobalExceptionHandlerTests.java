@@ -237,6 +237,78 @@ class GlobalExceptionHandlerTests {
     }
 
     @Test
+    void deveBuscarDetalhesPorTituloDoJogo() throws Exception {
+        mockMvc.perform(get("/detalhes-jogos/busca")
+                        .param("titulo", "Catan")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.91");
+                            return request;
+                        }))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deveRetornarBadRequestParaDatasInvalidasEmEmprestimo() throws Exception {
+        String sufixo = UUID.randomUUID().toString();
+
+        MvcResult usuarioCriado = mockMvc.perform(post("/usuarios")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.92");
+                            return request;
+                        })
+                        .header("Idempotency-Key", "teste-emprestimo-usuario-" + sufixo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Usuario Emprestimo Invalido",
+                                  "email": "emprestimo-invalido-%s@example.com"
+                                }
+                                """.formatted(sufixo)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String usuarioJson = usuarioCriado.getResponse().getContentAsString();
+        String usuarioId = usuarioJson.replaceAll(".*\"id\":(\\d+).*", "$1");
+
+        MvcResult chaveGerada = mockMvc.perform(post("/api-keys")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.92");
+                            return request;
+                        })
+                        .header("Idempotency-Key", "teste-emprestimo-api-key-" + sufixo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "usuarioId": %s
+                                }
+                                """.formatted(usuarioId)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String apiKeyJson = chaveGerada.getResponse().getContentAsString();
+        String apiKey = apiKeyJson.replaceAll(".*\"apiKey\":\"([^\"]+)\".*", "$1");
+
+        mockMvc.perform(post("/emprestimos")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.92");
+                            return request;
+                        })
+                        .header("X-API-Key", apiKey)
+                        .header("Idempotency-Key", "teste-emprestimo-data-invalida-" + sufixo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "dataEmprestimo": "2026-05-20",
+                                  "dataDevolucao": "2026-05-11",
+                                  "usuarioId": %s,
+                                  "jogoId": 1
+                                }
+                                """.formatted(usuarioId)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[0]").value(containsString("data de devolucao")));
+    }
+
+    @Test
     void deveRetornarNotFoundQuandoBuscaNaoTemResultado() throws Exception {
         mockMvc.perform(get("/editoras/busca")
                         .param("nome", "EditoraInexistenteParaTeste")

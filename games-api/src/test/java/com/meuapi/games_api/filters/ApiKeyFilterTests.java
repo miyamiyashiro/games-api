@@ -151,7 +151,7 @@ class ApiKeyFilterTests {
                             return request;
                         }))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("********")));
+                .andExpect(content().string(containsString(apiKey)));
 
         mockMvc.perform(get("/api-keys/{id}", usuarioId)
                         .with(request -> {
@@ -159,7 +159,7 @@ class ApiKeyFilterTests {
                             return request;
                         }))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("********")));
+                .andExpect(content().string(containsString(apiKey)));
 
         mockMvc.perform(delete("/api-keys/{id}", usuarioId)
                         .with(request -> {

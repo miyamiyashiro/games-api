@@ -492,6 +492,13 @@ select:focus {
   padding: 12px;
 }
 
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .resource-item span,
 .compact-lists li,
 .response-log,
@@ -543,7 +550,9 @@ select:focus {
   align-items: center;
 }
 
-#cancelGameEdit {
+#cancelGameEdit,
+#cancelDetailEdit,
+#cancelLoanEdit {
   display: none;
 }
 

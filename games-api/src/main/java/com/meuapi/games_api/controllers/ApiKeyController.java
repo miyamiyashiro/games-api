@@ -41,11 +41,11 @@ public class ApiKeyController {
             @ApiResponse(responseCode = "200", description = "Chaves listadas com sucesso"),
             @ApiResponse(responseCode = "401", description = "Chave de API ausente ou invalida")
     })
-    @Operation(summary = "Lista chaves de API", description = "Lista usuarios que possuem chave ativa, exibindo a chave mascarada")
+    @Operation(summary = "Lista chaves de API", description = "Lista usuarios que possuem chave ativa")
     @GetMapping
     public CollectionModel<EntityModel<ApiKeyResponse>> listar() {
         var chaves = usuarioRepository.findAllByApiKeyIsNotNull().stream()
-                .map(usuario -> criarModelo(usuario, true))
+                .map(usuario -> criarModelo(usuario, false))
                 .toList();
 
         return CollectionModel.of(chaves, linkTo(methodOn(ApiKeyController.class).listar()).withSelfRel());
@@ -60,7 +60,7 @@ public class ApiKeyController {
     @GetMapping("/{id}")
     public EntityModel<ApiKeyResponse> buscarPorId(@PathVariable Long id) {
         Usuario usuario = buscarUsuarioComChave(id);
-        return criarModelo(usuario, true);
+        return criarModelo(usuario, false);
     }
 
     @ApiResponses(value = {

@@ -4,7 +4,9 @@ const state = {
   usuarioId: localStorage.getItem("gamesApiUsuarioId") || "",
   idempotencyKey: `frontend-demo-idempotencia-${Date.now()}`,
   idempotencyEmail: `frontend-idempotencia-${Date.now()}@email.com`,
-  editingGameId: null
+  editingGameId: null,
+  editingDetailId: null,
+  editingLoanId: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -32,6 +34,18 @@ const elements = {
   gameFormTitle: $("#gameFormTitle"),
   saveGameButton: $("#saveGameButton"),
   cancelGameEdit: $("#cancelGameEdit"),
+  detailsForm: $("#detailsForm"),
+  detailFormTitle: $("#detailFormTitle"),
+  saveDetailButton: $("#saveDetailButton"),
+  cancelDetailEdit: $("#cancelDetailEdit"),
+  loadDetails: $("#loadDetails"),
+  detailsList: $("#detailsList"),
+  loanForm: $("#loanForm"),
+  loanFormTitle: $("#loanFormTitle"),
+  saveLoanButton: $("#saveLoanButton"),
+  cancelLoanEdit: $("#cancelLoanEdit"),
+  loadLoans: $("#loadLoans"),
+  loansList: $("#loansList"),
   userForm: $("#userForm"),
   apiKeyForm: $("#apiKeyForm"),
   apiKeyLookupId: $("#apiKeyLookupId"),
@@ -70,6 +84,15 @@ function activateView(viewId, updateHash = true) {
 
   if ((viewId === "recursos" || viewId === "cadastros") && !elements.publishersList.children.length) {
     loadCatalogs();
+  }
+
+  if (viewId === "cadastros") {
+    if (!elements.detailsList.children.length) {
+      loadDetails();
+    }
+    if (!elements.loansList.children.length) {
+      loadLoans();
+    }
   }
 }
 
@@ -207,6 +230,56 @@ function renderResourceCards(target, items, type) {
       <button class="danger-button" type="button" data-type="${type}" data-id="${item.id}">Excluir</button>
     `;
     target.appendChild(card);
+  });
+}
+
+function renderDetails(items) {
+  elements.detailsList.innerHTML = "";
+
+  if (!items.length) {
+    elements.detailsList.innerHTML = '<div class="empty-state">Nenhum detalhe encontrado.</div>';
+    return;
+  }
+
+  items.slice(0, 8).forEach((detail) => {
+    const card = document.createElement("article");
+    card.className = "resource-item";
+    card.innerHTML = `
+      <div>
+        <strong>#${detail.id ?? "-"} - Jogo ${detail.jogo?.id ?? "-"}</strong>
+        <span>${detail.descricao || "Sem descricao"} | ${detail.idadeMinima ?? "-"}+ | ${detail.tempoMedioMinutos ?? "-"} min</span>
+      </div>
+      <div class="item-actions">
+        <button type="button" data-action="edit-detail" data-id="${detail.id}">Editar</button>
+        <button class="danger-button" type="button" data-action="delete-detail" data-id="${detail.id}">Excluir</button>
+      </div>
+    `;
+    elements.detailsList.appendChild(card);
+  });
+}
+
+function renderLoans(items) {
+  elements.loansList.innerHTML = "";
+
+  if (!items.length) {
+    elements.loansList.innerHTML = '<div class="empty-state">Nenhum emprestimo encontrado.</div>';
+    return;
+  }
+
+  items.slice(0, 8).forEach((loan) => {
+    const card = document.createElement("article");
+    card.className = "resource-item";
+    card.innerHTML = `
+      <div>
+        <strong>#${loan.id ?? "-"} - Usuario ${loan.usuario?.id ?? "-"} / Jogo ${loan.jogo?.id ?? "-"}</strong>
+        <span>${loan.dataEmprestimo || "sem data"} -> ${loan.dataDevolucao || "sem devolucao"}</span>
+      </div>
+      <div class="item-actions">
+        <button type="button" data-action="edit-loan" data-id="${loan.id}">Editar</button>
+        <button class="danger-button" type="button" data-action="delete-loan" data-id="${loan.id}">Excluir</button>
+      </div>
+    `;
+    elements.loansList.appendChild(card);
   });
 }
 
@@ -429,9 +502,7 @@ function apiKeyAuthHeaders() {
 }
 
 async function listApiKeys() {
-  const result = await request("/api-keys", {
-    headers: apiKeyAuthHeaders()
-  });
+  const result = await request("/api-keys");
 
   logResponse("GET /api-keys", result.status, result.data, result.headers);
 }
@@ -445,9 +516,7 @@ async function getApiKey() {
     return;
   }
 
-  const result = await request(`/api-keys/${id}`, {
-    headers: apiKeyAuthHeaders()
-  });
+  const result = await request(`/api-keys/${id}`);
 
   logResponse(`GET /api-keys/${id}`, result.status, result.data, result.headers);
 }
@@ -500,6 +569,174 @@ async function createGame(event) {
     resetGameForm();
     await loadGames();
     activateView("acervo");
+  }
+}
+
+function resetDetailForm() {
+  state.editingDetailId = null;
+  elements.detailsForm.reset();
+  elements.detailsForm.jogoId.value = "1";
+  elements.detailsForm.idadeMinima.value = "10";
+  elements.detailsForm.tempoMedioMinutos.value = "60";
+  elements.detailFormTitle.textContent = "Detalhes de jogo";
+  elements.saveDetailButton.textContent = "Salvar detalhes";
+  elements.cancelDetailEdit.style.display = "none";
+}
+
+async function loadDetails() {
+  const result = await request("/detalhes-jogos?page=0&size=8");
+  renderDetails(extractItems(result.data));
+  logResponse("GET /detalhes-jogos?page=0&size=8", result.status, result.data, result.headers);
+}
+
+async function saveDetails(event) {
+  event.preventDefault();
+
+  const form = new FormData(elements.detailsForm);
+  const body = {
+    descricao: form.get("descricao"),
+    idadeMinima: Number(form.get("idadeMinima")),
+    tempoMedioMinutos: Number(form.get("tempoMedioMinutos")),
+    jogoId: Number(form.get("jogoId"))
+  };
+
+  const isEditing = Boolean(state.editingDetailId);
+  const path = isEditing ? `/detalhes-jogos/${state.editingDetailId}` : "/detalhes-jogos";
+  const method = isEditing ? "PUT" : "POST";
+  const headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": elements.apiKey.value.trim()
+  };
+
+  if (!isEditing) {
+    headers["Idempotency-Key"] = `frontend-detalhes-${Date.now()}`;
+  }
+
+  const result = await request(path, {
+    method,
+    headers,
+    body: JSON.stringify(body)
+  });
+
+  logResponse(`${method} ${path}`, result.status, result.data, result.headers);
+
+  if (result.ok) {
+    resetDetailForm();
+    await loadDetails();
+  }
+}
+
+async function startEditDetail(id) {
+  const result = await request(`/detalhes-jogos/${id}`);
+  logResponse(`GET /detalhes-jogos/${id}`, result.status, result.data, result.headers);
+
+  if (!result.ok || !result.data) {
+    return;
+  }
+
+  state.editingDetailId = id;
+  elements.detailsForm.jogoId.value = String(result.data.jogo?.id || 1);
+  elements.detailsForm.idadeMinima.value = String(result.data.idadeMinima ?? 10);
+  elements.detailsForm.tempoMedioMinutos.value = String(result.data.tempoMedioMinutos ?? 60);
+  elements.detailsForm.descricao.value = result.data.descricao || "";
+  elements.detailFormTitle.textContent = "Editar detalhes";
+  elements.saveDetailButton.textContent = "Salvar alteracoes";
+  elements.cancelDetailEdit.style.display = "inline-flex";
+}
+
+async function deleteDetail(id) {
+  const result = await request(`/detalhes-jogos/${id}`, {
+    method: "DELETE",
+    headers: apiKeyAuthHeaders()
+  });
+
+  logResponse(`DELETE /detalhes-jogos/${id}`, result.status, result.data || { mensagem: "Detalhes excluidos" }, result.headers);
+
+  if (result.ok || result.status === 204) {
+    await loadDetails();
+  }
+}
+
+function resetLoanForm() {
+  state.editingLoanId = null;
+  elements.loanForm.reset();
+  elements.loanForm.jogoId.value = "1";
+  elements.loanFormTitle.textContent = "Registro de emprestimo";
+  elements.saveLoanButton.textContent = "Salvar emprestimo";
+  elements.cancelLoanEdit.style.display = "none";
+}
+
+async function loadLoans() {
+  const result = await request("/emprestimos?page=0&size=8");
+  renderLoans(extractItems(result.data));
+  logResponse("GET /emprestimos?page=0&size=8", result.status, result.data, result.headers);
+}
+
+async function saveLoan(event) {
+  event.preventDefault();
+
+  const form = new FormData(elements.loanForm);
+  const body = {
+    dataEmprestimo: form.get("dataEmprestimo") || null,
+    dataDevolucao: form.get("dataDevolucao") || null,
+    usuarioId: Number(form.get("usuarioId")),
+    jogoId: Number(form.get("jogoId"))
+  };
+
+  const isEditing = Boolean(state.editingLoanId);
+  const path = isEditing ? `/emprestimos/${state.editingLoanId}` : "/emprestimos";
+  const method = isEditing ? "PUT" : "POST";
+  const headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": elements.apiKey.value.trim()
+  };
+
+  if (!isEditing) {
+    headers["Idempotency-Key"] = `frontend-emprestimo-${Date.now()}`;
+  }
+
+  const result = await request(path, {
+    method,
+    headers,
+    body: JSON.stringify(body)
+  });
+
+  logResponse(`${method} ${path}`, result.status, result.data, result.headers);
+
+  if (result.ok) {
+    resetLoanForm();
+    await loadLoans();
+  }
+}
+
+async function startEditLoan(id) {
+  const result = await request(`/emprestimos/${id}`);
+  logResponse(`GET /emprestimos/${id}`, result.status, result.data, result.headers);
+
+  if (!result.ok || !result.data) {
+    return;
+  }
+
+  state.editingLoanId = id;
+  elements.loanForm.usuarioId.value = String(result.data.usuario?.id || "");
+  elements.loanForm.jogoId.value = String(result.data.jogo?.id || 1);
+  elements.loanForm.dataEmprestimo.value = result.data.dataEmprestimo || "";
+  elements.loanForm.dataDevolucao.value = result.data.dataDevolucao || "";
+  elements.loanFormTitle.textContent = "Editar emprestimo";
+  elements.saveLoanButton.textContent = "Salvar alteracoes";
+  elements.cancelLoanEdit.style.display = "inline-flex";
+}
+
+async function deleteLoan(id) {
+  const result = await request(`/emprestimos/${id}`, {
+    method: "DELETE",
+    headers: apiKeyAuthHeaders()
+  });
+
+  logResponse(`DELETE /emprestimos/${id}`, result.status, result.data || { mensagem: "Emprestimo excluido" }, result.headers);
+
+  if (result.ok || result.status === 204) {
+    await loadLoans();
   }
 }
 
@@ -645,6 +882,42 @@ elements.getApiKey.addEventListener("click", getApiKey);
 elements.revokeApiKey.addEventListener("click", revokeApiKey);
 elements.gameForm.addEventListener("submit", createGame);
 elements.cancelGameEdit.addEventListener("click", resetGameForm);
+elements.detailsForm.addEventListener("submit", saveDetails);
+elements.cancelDetailEdit.addEventListener("click", resetDetailForm);
+elements.loadDetails.addEventListener("click", loadDetails);
+elements.detailsList.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action][data-id]");
+  if (!button) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-detail") {
+    startEditDetail(button.dataset.id);
+    return;
+  }
+
+  if (button.dataset.action === "delete-detail") {
+    deleteDetail(button.dataset.id);
+  }
+});
+elements.loanForm.addEventListener("submit", saveLoan);
+elements.cancelLoanEdit.addEventListener("click", resetLoanForm);
+elements.loadLoans.addEventListener("click", loadLoans);
+elements.loansList.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action][data-id]");
+  if (!button) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-loan") {
+    startEditLoan(button.dataset.id);
+    return;
+  }
+
+  if (button.dataset.action === "delete-loan") {
+    deleteLoan(button.dataset.id);
+  }
+});
 elements.test401.addEventListener("click", test401);
 elements.test409First.addEventListener("click", test409First);
 elements.test409Second.addEventListener("click", test409Second);

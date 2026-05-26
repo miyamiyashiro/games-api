@@ -35,6 +35,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import java.util.List;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -90,6 +92,28 @@ public class DetalhesJogoController {
         DetalhesJogo detalhes = repository.findByJogoId(jogoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Detalhes nao encontrados para o jogo ID: " + jogoId));
         return criarModelo(detalhes);
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetro inválido"),
+            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados para o jogo informado")
+    })
+    @Operation(summary = "Consulta personalizada por nome do jogo", description = "Busca os detalhes complementares pelo título do jogo")
+    @GetMapping("/busca")
+    public PagedModel<EntityModel<DetalhesJogo>> buscarPorTituloDoJogo(@org.springframework.web.bind.annotation.RequestParam String titulo) {
+        String termo = titulo == null ? "" : titulo.trim();
+        if (termo.isBlank() || termo.matches("\\d+")) {
+            throw new IllegalArgumentException("O parametro titulo deve conter texto.");
+        }
+
+        List<DetalhesJogo> detalhes = repository.findByJogoTituloContainingIgnoreCase(termo);
+        if (detalhes.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Nenhum detalhe encontrado para jogos com titulo: " + termo);
+        }
+
+        List<EntityModel<DetalhesJogo>> modelos = detalhes.stream().map(this::criarModelo).toList();
+        return PagedModel.of(modelos, new PagedModel.PageMetadata(modelos.size(), 0, modelos.size()));
     }
 
     @ApiResponses(value = {

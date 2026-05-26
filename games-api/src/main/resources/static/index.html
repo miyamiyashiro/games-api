@@ -176,6 +176,70 @@
           </div>
         </article>
       </div>
+
+      <div class="split-grid">
+        <article class="workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Detalhes</p>
+              <h2 id="detailFormTitle">Detalhes de jogo</h2>
+            </div>
+            <button id="loadDetails" type="button" class="btn-secondary">Carregar</button>
+          </div>
+          <form id="detailsForm" class="form-grid">
+            <label>
+              Jogo ID
+              <input name="jogoId" type="number" min="1" value="1" required>
+            </label>
+            <label>
+              Idade minima
+              <input name="idadeMinima" type="number" min="0" max="18" value="10" required>
+            </label>
+            <label>
+              Tempo medio
+              <input name="tempoMedioMinutos" type="number" min="1" value="60" required>
+            </label>
+            <label>
+              Descricao
+              <input name="descricao" required placeholder="Resumo do jogo">
+            </label>
+            <button id="saveDetailButton" type="submit" class="btn-primary">Salvar detalhes</button>
+            <button id="cancelDetailEdit" class="btn-secondary" type="button">Cancelar edicao</button>
+          </form>
+          <div id="detailsList" class="resource-list" aria-live="polite"></div>
+        </article>
+
+        <article class="workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Emprestimos</p>
+              <h2 id="loanFormTitle">Registro de emprestimo</h2>
+            </div>
+            <button id="loadLoans" type="button" class="btn-secondary">Carregar</button>
+          </div>
+          <form id="loanForm" class="form-grid">
+            <label>
+              Usuario ID
+              <input name="usuarioId" type="number" min="1" required>
+            </label>
+            <label>
+              Jogo ID
+              <input name="jogoId" type="number" min="1" value="1" required>
+            </label>
+            <label>
+              Data emprestimo
+              <input name="dataEmprestimo" type="date">
+            </label>
+            <label>
+              Data devolucao
+              <input name="dataDevolucao" type="date">
+            </label>
+            <button id="saveLoanButton" type="submit" class="btn-primary">Salvar emprestimo</button>
+            <button id="cancelLoanEdit" class="btn-secondary" type="button">Cancelar edicao</button>
+          </form>
+          <div id="loansList" class="resource-list" aria-live="polite"></div>
+        </article>
+      </div>
     </section>
 
     <section id="seguranca" class="view">
@@ -245,12 +309,12 @@
           <strong>Sem API Key</strong>
         </button>
         <button id="test409First" type="button" class="test-btn warn">
-          <span>1</span>
-          <strong>Idempotencia A</strong>
+          <span>201</span>
+          <strong>Criar com chave</strong>
         </button>
         <button id="test409Second" type="button" class="test-btn warn">
           <span>409</span>
-          <strong>JSON alterado</strong>
+          <strong>Repetir JSON alterado</strong>
         </button>
         <button id="test429" type="button" class="test-btn info">
           <span>429</span>
@@ -282,6 +346,6 @@
   </main>
 </div>
 
-<script src="app.js?v=20260524"></script>
+<script src="app.js?v=20260526"></script>
 </body>
 </html>
