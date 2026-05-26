@@ -72,7 +72,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         }
 
         if (path.startsWith("/api-keys")) {
-            return !("POST".equals(metodo) && path.equals("/api-keys"));
+            return "DELETE".equals(metodo);
         }
 
         if (!METODOS_PROTEGIDOS.contains(metodo)) {

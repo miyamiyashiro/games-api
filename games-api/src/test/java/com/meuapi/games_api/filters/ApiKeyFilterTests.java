@@ -53,6 +53,7 @@ class ApiKeyFilterTests {
                             request.setRemoteAddr("203.0.113.31");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-usuario-api-key-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -71,6 +72,7 @@ class ApiKeyFilterTests {
                             request.setRemoteAddr("203.0.113.31");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-gerar-api-key-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -90,6 +92,7 @@ class ApiKeyFilterTests {
                             return request;
                         })
                         .header("X-API-Key", apiKey)
+                        .header("Idempotency-Key", "teste-editora-protegida-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -109,6 +112,7 @@ class ApiKeyFilterTests {
                             request.setRemoteAddr(ip);
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-usuario-gerenciamento-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -127,6 +131,7 @@ class ApiKeyFilterTests {
                             request.setRemoteAddr(ip);
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-api-key-gerenciamento-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -145,14 +150,14 @@ class ApiKeyFilterTests {
                             request.setRemoteAddr(ip);
                             return request;
                         }))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("********")));
 
         mockMvc.perform(get("/api-keys/{id}", usuarioId)
                         .with(request -> {
                             request.setRemoteAddr(ip);
                             return request;
-                        })
-                        .header("X-API-Key", apiKey))
+                        }))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("********")));
 
@@ -170,6 +175,7 @@ class ApiKeyFilterTests {
                             return request;
                         })
                         .header("X-API-Key", apiKey)
+                        .header("Idempotency-Key", "teste-chave-revogada-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

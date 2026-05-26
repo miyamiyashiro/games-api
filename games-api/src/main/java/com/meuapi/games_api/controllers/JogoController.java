@@ -104,7 +104,7 @@ public class JogoController {
                             description = "Chave única para evitar duplicidade (ex: 12345)",
                             in = ParameterIn.HEADER,
                             schema = @Schema(type = "string"),
-                            required = false
+                            required = true
                     )
             }
     )

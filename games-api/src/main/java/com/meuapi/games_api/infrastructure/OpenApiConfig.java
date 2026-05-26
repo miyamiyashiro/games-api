@@ -16,6 +16,7 @@ import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.springdoc.core.customizers.OpenApiCustomizer;
@@ -50,7 +51,7 @@ import java.util.Set;
                         "## Parte II - Autenticacao com X-API-Key (HTTP 401)\n" +
                         "Operacoes de escrita (POST, PUT, PATCH, DELETE) exigem o header `X-API-Key`.\n" +
                         "Consultas GET, `POST /usuarios` e `POST /api-keys` sao publicos para permitir o fluxo inicial. " +
-                        "O gerenciamento em `GET /api-keys`, `GET /api-keys/{id}` e `DELETE /api-keys/{id}` exige chave valida.\n" +
+                        "`GET /api-keys` e `GET /api-keys/{id}` sao publicos e mostram a chave mascarada; `DELETE /api-keys/{id}` exige chave valida.\n" +
                         "Sem a chave ou com uma chave invalida, a API retorna **401 Unauthorized**.\n" +
                         "Fluxo: 1) Crie um usuario em `POST /usuarios` | " +
                         "2) Gere sua chave em `POST /api-keys` | " +
@@ -60,7 +61,7 @@ import java.util.Set;
                         "Ao exceder, o IP fica bloqueado 30 segundos. " +
                         "O header `Retry-After` informa o tempo de espera.\n\n" +
                         "## Parte II - Idempotencia (HTTP 409)\n" +
-                        "Envie `Idempotency-Key` no header em POST/PUT/PATCH. " +
+                        "Envie `Idempotency-Key` no header em operacoes POST. " +
                         "Se a mesma chave for reutilizada com JSON diferente, retorna **409 Conflict**.\n\n" +
                         "## Parte II - CORS\n" +
                         "A API aceita requisicoes cross-origin e libera os headers `X-API-Key` e `Idempotency-Key`. " +
@@ -124,9 +125,8 @@ public class OpenApiConfig {
                             operation.getResponses().remove("401");
                         }
 
-                        if (method == PathItem.HttpMethod.POST
-                                || method == PathItem.HttpMethod.PUT
-                                || method == PathItem.HttpMethod.PATCH) {
+                        if (method == PathItem.HttpMethod.POST) {
+                            ensureIdempotencyParameter(operation);
                             addResponseIfAbsent(operation, "409", "Conflito de idempotencia ou regra de unicidade.");
                         }
                     })
@@ -141,7 +141,7 @@ public class OpenApiConfig {
 
     private boolean isProtectedApiKeyManagementRoute(PathItem.HttpMethod method, String path) {
         return ("/api-keys".equals(path) || "/api-keys/{id}".equals(path))
-                && method != PathItem.HttpMethod.POST;
+                && method == PathItem.HttpMethod.DELETE;
     }
 
     private boolean isCustomSearchRoute(PathItem.HttpMethod method, String path) {
@@ -150,6 +150,30 @@ public class OpenApiConfig {
                 || path.contains("/data")
                 || path.contains("/email/")
                 || path.contains("/jogo/"));
+    }
+
+    private void ensureIdempotencyParameter(Operation operation) {
+        if (operation.getParameters() != null) {
+            operation.getParameters().stream()
+                    .filter(parameter -> "Idempotency-Key".equals(parameter.getName()))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            parameter -> parameter.required(true),
+                            () -> operation.addParametersItem(idempotencyParameter())
+                    );
+            return;
+        }
+
+        operation.addParametersItem(idempotencyParameter());
+    }
+
+    private Parameter idempotencyParameter() {
+        return new Parameter()
+                .name("Idempotency-Key")
+                .in("header")
+                .required(true)
+                .description("Chave unica obrigatoria para POST. Reutilizar a mesma chave com JSON diferente retorna 409.")
+                .schema(new StringSchema().example("demo-idempotencia-001"));
     }
 
     private void addResponseIfAbsent(Operation operation, String code, String description) {

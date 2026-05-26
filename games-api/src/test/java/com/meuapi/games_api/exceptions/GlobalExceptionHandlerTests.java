@@ -47,6 +47,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.81");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-validacao-usuario")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -77,6 +78,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.89");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-email-duplicado-primeiro-" + email)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated());
@@ -86,6 +88,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.90");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-email-duplicado-segundo-" + email)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isConflict())
@@ -118,6 +121,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.83");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-metodo-usuario-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -136,6 +140,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.83");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-metodo-api-key-" + sufixo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -153,6 +158,7 @@ class GlobalExceptionHandlerTests {
                             request.setRemoteAddr("203.0.113.83");
                             return request;
                         })
+                        .header("Idempotency-Key", "teste-metodo-invalido-" + sufixo)
                         .header("X-API-Key", apiKey))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.status").value(405))

@@ -54,7 +54,7 @@ Autora: Luana Miyashiro Salles de Oliveira
 | `HTTP 401 Unauthorized` | Escritas protegidas exigem `X-API-Key`; chave ausente ou inválida retorna `401` |
 | API Key | Usuário cria conta, gera chave em `POST /api-keys` e usa o header `X-API-Key` |
 | `HTTP 429 Too Many Requests` | Rate limit por IP com bloqueio de 30 segundos ao exceder o limite |
-| Idempotência | `POST`, `PUT` e `PATCH` aceitam `Idempotency-Key` |
+| Idempotência | `POST` exige `Idempotency-Key` |
 | `HTTP 409 Conflict` | Mesma chave de idempotência com JSON diferente retorna `409` |
 | CORS | Permite chamadas web, headers customizados e métodos REST |
 | Versionamento | Dois contratos versionados do recurso Jogos: `GET /api/v1/jogos` e `GET /api/v2/jogos` |
@@ -155,7 +155,7 @@ Casos tratados: validacao `400`, JSON invalido `400`, recurso inexistente `404`,
 
 ## Idempotência
 
-Operações `POST`, `PUT` e `PATCH` aceitam o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisição é enviada mais de uma vez.
+Operações `POST` exigem o header `Idempotency-Key`. A chave identifica uma tentativa de escrita e evita duplicidade quando a mesma requisição é enviada mais de uma vez. Se o header não for enviado, a API retorna `HTTP 400 Bad Request`.
 
 Comportamento esperado:
 

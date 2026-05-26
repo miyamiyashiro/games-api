@@ -7,14 +7,14 @@
     <list default="true" id="160fb15f-e14a-42a1-8bf5-eb17ea3f7386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/exceptions/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/DetalhesJogoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/DetalhesJogoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/controllers/JogoController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/ApiKeyFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/ApiKeyFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/IdempotencyFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/filters/IdempotencyFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/java/com/meuapi/games_api/infrastructure/OpenApiConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/games-api/src/main/resources/static/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/main/resources/static/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/exceptions/GlobalExceptionHandlerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/exceptions/GlobalExceptionHandlerTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/ApiKeyFilterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/ApiKeyFilterTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/IdempotencyFilterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/games-api/src/test/java/com/meuapi/games_api/filters/IdempotencyFilterTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

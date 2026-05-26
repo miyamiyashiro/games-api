@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -36,9 +37,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IdempotencyFilter extends OncePerRequestFilter {
 
     private static final String IDEMPOTENCY_HEADER = "Idempotency-Key";
-    private static final Set<String> METODOS_VERIFICADOS = Set.of("POST", "PUT", "PATCH");
+    private static final Set<String> METODOS_VERIFICADOS = Set.of("POST");
 
-    private record IdempotencyEntry(String method, String path, String normalizedBody) {
+    private record IdempotencyEntry(
+            String method,
+            String path,
+            String normalizedBody,
+            int responseStatus,
+            String responseContentType,
+            byte[] responseBody
+    ) {
     }
 
     private final Map<String, IdempotencyEntry> cache = new ConcurrentHashMap<>();
@@ -61,7 +69,10 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         String idempotencyKey = request.getHeader(IDEMPOTENCY_HEADER);
 
         if (idempotencyKey == null || idempotencyKey.isBlank()) {
-            filterChain.doFilter(request, response);
+            escreverRespostaErro(response, HttpStatus.BAD_REQUEST,
+                    "Header Idempotency-Key obrigatorio para POST.",
+                    request,
+                    List.of("Envie uma chave unica no header Idempotency-Key para identificar esta tentativa de escrita."));
             return;
         }
 
@@ -71,21 +82,29 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             return;
         }
 
-        IdempotencyEntry entradaAtual = new IdempotencyEntry(
-                metodo,
-                request.getRequestURI(),
-                corpoNormalizado
-        );
         IdempotencyEntry entradaAnterior = cache.get(idempotencyKey);
 
         if (entradaAnterior == null) {
-            cache.put(idempotencyKey, entradaAtual);
-            filterChain.doFilter(requestWrapper, response);
+            ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
+            filterChain.doFilter(requestWrapper, responseWrapper);
+
+            if (responseWrapper.getStatus() >= 200 && responseWrapper.getStatus() < 300) {
+                cache.put(idempotencyKey, new IdempotencyEntry(
+                        metodo,
+                        request.getRequestURI(),
+                        corpoNormalizado,
+                        responseWrapper.getStatus(),
+                        responseWrapper.getContentType(),
+                        responseWrapper.getContentAsByteArray()
+                ));
+            }
+
+            responseWrapper.copyBodyToResponse();
             return;
         }
 
-        if (!entradaAnterior.method().equals(entradaAtual.method())
-                || !entradaAnterior.path().equals(entradaAtual.path())) {
+        if (!entradaAnterior.method().equals(metodo)
+                || !entradaAnterior.path().equals(request.getRequestURI())) {
             escreverRespostaErro(response, HttpStatus.CONFLICT,
                     "Conflito de idempotencia: esta chave ja foi usada em outra operacao.",
                     request,
@@ -93,7 +112,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!entradaAnterior.normalizedBody().equals(entradaAtual.normalizedBody())) {
+        if (!entradaAnterior.normalizedBody().equals(corpoNormalizado)) {
             escreverRespostaErro(response, HttpStatus.CONFLICT,
                     "Conflito de idempotencia: o corpo da requisicao e diferente do original para esta chave.",
                     request,
@@ -101,7 +120,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             return;
         }
 
-        escreverRespostaSucessoIdempotente(response, idempotencyKey);
+        repetirRespostaOriginal(response, entradaAnterior);
     }
 
     private void escreverRespostaErro(
@@ -127,18 +146,12 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         objectMapper.writeValue(response.getWriter(), corpo);
     }
 
-    private void escreverRespostaSucessoIdempotente(HttpServletResponse response, String chave) throws IOException {
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        Map<String, Object> corpo = Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", 200,
-                "mensagem", "Operacao ja realizada anteriormente. O processamento foi ignorado para evitar duplicidade.",
-                "idempotencyKey", chave
-        );
-
-        objectMapper.writeValue(response.getWriter(), corpo);
+    private void repetirRespostaOriginal(HttpServletResponse response, IdempotencyEntry entrada) throws IOException {
+        response.setStatus(entrada.responseStatus());
+        if (entrada.responseContentType() != null) {
+            response.setContentType(entrada.responseContentType());
+        }
+        response.getOutputStream().write(entrada.responseBody());
     }
 
     private String normalizarBodyOuResponderErro(

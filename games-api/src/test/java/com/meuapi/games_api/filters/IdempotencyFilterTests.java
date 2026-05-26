@@ -21,6 +21,25 @@ class IdempotencyFilterTests {
     private MockMvc mockMvc;
 
     @Test
+    void deveRetornarBadRequestQuandoIdempotencyKeyNaoForInformada() throws Exception {
+        mockMvc.perform(post("/usuarios")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.22");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Usuario sem idempotencia",
+                                  "email": "sem-idempotencia@example.com"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.mensagem").value("Header Idempotency-Key obrigatorio para POST."));
+    }
+
+    @Test
     void deveIgnorarRequisicaoRepetidaComMesmoJsonSemantico() throws Exception {
         String key = UUID.randomUUID().toString();
         String ip = "203.0.113.20";
@@ -47,12 +66,12 @@ class IdempotencyFilterTests {
                         })
                         .header("Idempotency-Key", key)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
+                .content("""
                                 {"email":"idempotente-1@example.com","nome":"Usuario Idempotente"}
                                 """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.idempotencyKey").value(key));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("Usuario Idempotente"))
+                .andExpect(jsonPath("$.email").value("idempotente-1@example.com"));
     }
 
     @Test
