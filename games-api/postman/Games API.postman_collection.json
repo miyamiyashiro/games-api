@@ -87,10 +87,10 @@
           }
         },
         {
-          "name": "09 - Buscar detalhes pelo ID do jogo",
+          "name": "09 - Buscar detalhes pelo nome do jogo",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/detalhes-jogos/jogo/1"
+            "url": "{{baseUrl}}/detalhes-jogos/busca?titulo=Catan"
           }
         }
       ]

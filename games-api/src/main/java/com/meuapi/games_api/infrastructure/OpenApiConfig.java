@@ -152,8 +152,7 @@ public class OpenApiConfig {
         return method == PathItem.HttpMethod.GET
                 && (path.contains("/busca")
                 || path.contains("/data")
-                || path.contains("/email/")
-                || path.contains("/jogo/"));
+                || path.contains("/email/"));
     }
 
     private boolean shouldDocumentBadRequest(PathItem.HttpMethod method, String path) {

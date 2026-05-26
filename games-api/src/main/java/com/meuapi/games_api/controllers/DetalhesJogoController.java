@@ -82,17 +82,6 @@ public class DetalhesJogoController {
         return criarModelo(detalhes);
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Detalhes não encontrados para o jogo informado")
-    })
-    @Operation(summary = "Consulta personalizada por jogo", description = "Busca os detalhes complementares pelo ID do jogo")
-    @GetMapping("/jogo/{jogoId}")
-    public EntityModel<DetalhesJogo> buscarPorJogo(@PathVariable Long jogoId) {
-        DetalhesJogo detalhes = repository.findByJogoId(jogoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Detalhes nao encontrados para o jogo ID: " + jogoId));
-        return criarModelo(detalhes);
-    }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Detalhes encontrados com sucesso"),
