@@ -79,8 +79,7 @@ public class EditoraController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Editora cadastrada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
-            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)")
     })
     @Operation(summary = "Cadastra uma nova editora", description = "Cria uma editora para vinculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping

@@ -79,8 +79,7 @@ public class PlataformaController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Plataforma cadastrada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
-            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)")
     })
     @Operation(summary = "Cadastra nova plataforma", description = "Cria uma nova plataforma para vínculo com jogos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping

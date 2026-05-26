@@ -33,47 +33,47 @@ import java.util.Set;
         in = SecuritySchemeIn.HEADER,
         paramName = "X-API-Key",
         description = "Chave de API gerada pelo endpoint POST /api-keys. " +
-                      "Obrigatoria para POST, PUT, PATCH e DELETE. GETs sao publicos."
+                      "Obrigatória para POST, PUT, PATCH e DELETE. GETs sao publicos."
 )
 @OpenAPIDefinition(
         info = @Info(
                 title = "GamesBoard API",
                 version = "1.0.0",
-                description = "Sistema completo para gestao de acervos e emprestimos de jogos.\n\n" +
+                description = "Sistema completo para gestão de acervos e empréstimos de jogos.\n\n" +
                         "## Parte I - Fundamentos REST\n" +
                         "- Projeto Maven com Spring Boot, JPA/Hibernate e H2.\n" +
-                        "- CRUD REST para Jogos, Usuarios, Editoras, Plataformas, Emprestimos e Detalhes dos Jogos.\n" +
+                        "- CRUD REST para Jogos, Usuários, Editoras, Plataformas, Empréstimos e Detalhes dos Jogos.\n" +
                         "- Respostas paginadas com Spring Data Pageable e links HATEOAS.\n" +
                         "- Relacionamentos JPA: One-to-One, One-to-Many, Many-to-One e Many-to-Many.\n" +
                         "- Enum Categoria para classificar os jogos.\n" +
-                        "- Validacao com Bean Validation nos DTOs de entrada.\n" +
-                        "- Consultas personalizadas, tratamento global de erros, README, colecao Postman e deploy.\n\n" +
-                        "## Parte II - Autenticacao com X-API-Key (HTTP 401)\n" +
-                        "Operacoes de escrita (POST, PUT, PATCH, DELETE) exigem o header `X-API-Key`.\n" +
-                        "Consultas GET, `POST /usuarios` e `POST /api-keys` sao publicos para permitir o fluxo inicial. " +
-                        "`GET /api-keys` e `GET /api-keys/{id}` sao publicos e mostram a chave mascarada; `DELETE /api-keys/{id}` exige chave valida.\n" +
-                        "Sem a chave ou com uma chave invalida, a API retorna **401 Unauthorized**.\n" +
-                        "Fluxo: 1) Crie um usuario em `POST /usuarios` | " +
+                        "- Validação com Bean Validation nos DTOs de entrada.\n" +
+                        "- Consultas personalizadas, tratamento global de erros, README, coleção Postman e deploy.\n\n" +
+                        "## Parte II - Autenticação com X-API-Key (HTTP 401)\n" +
+                        "Operações de escrita (POST, PUT, PATCH, DELETE) exigem o header `X-API-Key`.\n" +
+                        "Consultas GET, `POST /usuarios` e `POST /api-keys` sao públicos para permitir o fluxo inicial. " +
+                        "`GET /api-keys` e `GET /api-keys/{id}` sao públicos e mostram a chave mascarada; `DELETE /api-keys/{id}` exige chave válida.\n" +
+                        "Sem a chave ou com uma chave inválida, a API retorna **401 Unauthorized**.\n" +
+                        "Fluxo: 1) Crie um usuário em `POST /usuários` | " +
                         "2) Gere sua chave em `POST /api-keys` | " +
-                        "3) Use a chave no header `X-API-Key` em todas as operacoes de escrita.\n\n" +
+                        "3) Use a chave no header `X-API-Key` em todas as operações de escrita.\n\n" +
                         "## Parte II - Rate Limiting (HTTP 429)\n" +
                         "Limite de 10 requisicoes por minuto por IP. " +
                         "Ao exceder, o IP fica bloqueado 30 segundos. " +
                         "O header `Retry-After` informa o tempo de espera.\n\n" +
                         "## Parte II - Idempotencia (HTTP 409)\n" +
-                        "Envie `Idempotency-Key` no header em operacoes POST. " +
+                        "Envie `Idempotency-Key` no header em operações POST. " +
                         "Se a mesma chave for reutilizada com JSON diferente, retorna **409 Conflict**.\n\n" +
                         "## Parte II - CORS\n" +
-                        "A API aceita requisicoes cross-origin e libera os headers `X-API-Key` e `Idempotency-Key`. " +
+                        "A API aceita requisições cross-origin e libera os headers `X-API-Key` e `Idempotency-Key`. " +
                         "Tambem expoe os headers de rate limit e autenticacao para clientes web.\n\n" +
                         "## Parte II - Versionamento\n" +
                         "A API demonstra versionamento por URL em dois contratos do recurso Jogos: " +
-                        "`GET /api/v1/jogos` retorna uma versao simplificada e " +
-                        "`GET /api/v2/jogos` retorna uma versao completa com HATEOAS. " +
+                        "`GET /api/v1/jogos` retorna uma versão simplificada e " +
+                        "`GET /api/v2/jogos` retorna uma versão completa com HATEOAS. " +
                         "Tambem existem os endpoints auxiliares `GET /api/v1/status` e `GET /api/v2/status`.\n\n" +
                         "## Tratamento de erros\n" +
                         "Erros seguem o contrato `ApiErrorResponse`, com `timestamp`, `status`, `erro`, " +
-                        "`mensagem`, `caminho`, `metodo` e `detalhes`.",
+                        "`mensagem`, `caminho`, `método` e `detalhes`.",
                 contact = @Contact(name = "Luana Miyashiro")
         ),
         tags = {
@@ -83,7 +83,7 @@ import java.util.Set;
                 @Tag(name = "Plataformas", description = "Plataformas ou formatos dos jogos. Demonstra Many-to-Many com Jogos."),
                 @Tag(name = "Empréstimos", description = "Controle de empréstimos, relacionando Usuário e Jogo com validação de datas."),
                 @Tag(name = "Detalhes dos Jogos", description = "Informações complementares em relacionamento One-to-One com Jogo."),
-                @Tag(name = "Autenticacao - API Keys", description = "Geracao, consulta e revogacao de chaves de API vinculadas aos usuarios."),
+                @Tag(name = "Autenticação - API Keys", description = "Geração, consulta e revogação de chaves de API vinculadas aos usuários."),
                 @Tag(name = "Versionamento", description = "Endpoints auxiliares de status em v1 e v2."),
                 @Tag(name = "Jogos Versionados", description = "Contratos v1 e v2 do recurso Jogos, demonstrando evolução de resposta por URL.")
         }
@@ -111,7 +111,11 @@ public class OpenApiConfig {
                         boolean protectedApiKeyManagement = isProtectedApiKeyManagementRoute(method, path);
                         boolean protectedOperation = protectedWrite || protectedApiKeyManagement;
 
-                        addResponseIfAbsent(operation, "400", "Requisicao invalida, JSON mal formatado ou dados fora do contrato.");
+                        if (shouldDocumentBadRequest(method, path)) {
+                            addResponseIfAbsent(operation, "400", "Requisicao invalida, JSON mal formatado ou dados fora do contrato.");
+                        } else {
+                            operation.getResponses().remove("400");
+                        }
                         addResponseIfAbsent(operation, "429", "Muitas requisicoes. O cliente deve aguardar o tempo indicado em Retry-After.");
 
                         if (isCustomSearchRoute(method, path)) {
@@ -150,6 +154,13 @@ public class OpenApiConfig {
                 || path.contains("/data")
                 || path.contains("/email/")
                 || path.contains("/jogo/"));
+    }
+
+    private boolean shouldDocumentBadRequest(PathItem.HttpMethod method, String path) {
+        return method == PathItem.HttpMethod.POST
+                || method == PathItem.HttpMethod.PUT
+                || method == PathItem.HttpMethod.PATCH
+                || isCustomSearchRoute(method, path);
     }
 
     private void ensureIdempotencyParameter(Operation operation) {

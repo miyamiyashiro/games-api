@@ -160,7 +160,7 @@ Operações `POST` exigem o header `Idempotency-Key`. A chave identifica uma ten
 Comportamento esperado:
 
 * Chave nova: a API processa normalmente a operação.
-* Mesma chave, mesmo endpoint e mesmo JSON: a API retorna `HTTP 200 OK` e ignora o novo processamento.
+* Mesma chave, mesmo endpoint e mesmo JSON: a API retorna a mesma resposta da primeira requisição e ignora o novo processamento.
 * Mesma chave com JSON alterado: a API retorna `HTTP 409 Conflict`.
 * Mesma chave usada em outro endpoint ou método: a API retorna `HTTP 409 Conflict`.
 

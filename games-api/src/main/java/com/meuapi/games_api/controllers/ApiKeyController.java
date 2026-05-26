@@ -27,7 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@Tag(name = "Autenticacao - API Keys")
+@Tag(name = "Autenticação - API Keys")
 @RequestMapping("/api-keys")
 public class ApiKeyController {
 

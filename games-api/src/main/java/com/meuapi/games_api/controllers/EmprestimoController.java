@@ -94,8 +94,7 @@ public class EmprestimoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Empréstimo registrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Erro de validação ou falta de dados obrigatórios"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
-            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)")
     })
     @PostMapping
     public ResponseEntity<EntityModel<Emprestimo>> realizarEmprestimo(@Valid @RequestBody EmprestimoRequest request) {

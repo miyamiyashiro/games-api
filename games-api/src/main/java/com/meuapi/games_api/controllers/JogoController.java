@@ -92,8 +92,7 @@ public class JogoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Jogo cadastrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência"), // Boa prática adicionar essa!
-            @ApiResponse(responseCode = "200", description = "Operação já realizada (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência") // Boa prática adicionar essa!
     })
     @Operation(
             summary = "Cadastra um novo jogo",

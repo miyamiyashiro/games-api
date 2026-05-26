@@ -95,8 +95,7 @@ public class DetalhesJogoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Detalhes cadastrados com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)"),
-            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência (Chave repetida com corpo diferente)")
     })
     @Operation(
             summary = "Cadastra detalhes de um jogo",

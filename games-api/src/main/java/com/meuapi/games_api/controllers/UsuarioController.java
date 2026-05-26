@@ -61,8 +61,7 @@ public class UsuarioController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "409", description = "Conflito de idempotência ou e-mail já cadastrado"),
-            @ApiResponse(responseCode = "200", description = "Operação já realizada anteriormente (Idempotência)")
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência ou e-mail já cadastrado")
     })
     @Operation(summary = "Cadastra um novo usuário", description = "Cria um perfil de cliente para realizar empréstimos", parameters = { @Parameter(name = "Idempotency-Key", in = ParameterIn.HEADER, schema = @Schema(type = "string")) })
     @PostMapping
